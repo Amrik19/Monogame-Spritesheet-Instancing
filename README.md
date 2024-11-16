@@ -1,3 +1,3 @@
 # Monogame-Spritesheet-Instancing
 A Spritesheet Instancing class and shader that is build nearly like the Spritebatch from Monogame
-images/SpriteSheet Instancing Pic.PNG
+![Main pic](images/SpriteSheet Instancing Pic.png)
