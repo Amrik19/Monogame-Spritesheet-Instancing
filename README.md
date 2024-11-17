@@ -71,6 +71,7 @@ Using a single 4K sprite sheet and random positions:
 **- UpdateViewPort()**
    - Updates the viewport settings.
    - Essential for maintaining accurate scaling and functionality when the game window size changes.
+
     
 **- ReturnSpritesheet()**
    - Returns the current Texture2D associated with the class.
