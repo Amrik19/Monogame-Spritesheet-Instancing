@@ -75,7 +75,7 @@ namespace Monogame.SpritesheetInstancing
 
             /// <summary>
             /// Render Rectangles are not bigger than 65k
-            /// Bitshifts 2 values together for a smaler vertexbuffer
+            /// Bitshifts 2 values together for a smaller vertexbuffer
             /// </summary>
             /// <returns></returns>            
             public static int RectangleSqueezer(int x, int y)
