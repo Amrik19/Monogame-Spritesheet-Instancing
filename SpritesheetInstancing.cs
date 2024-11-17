@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Monogame.SpritesheetInstancing
 {
     /// <summary>
-    /// This class allows Instancing of rectangles out of a spritebatch or the complete texure.
+    /// This class allows Instancing of rectangles out of a spritesheet or the complete texure.
     /// It draws always from back to front.
     /// Requires DX11 (DX10) and GraphicsProfile.HiDef
     /// </summary>
