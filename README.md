@@ -9,9 +9,22 @@ The class supports a single texture at a time, requiring swaps for different spr
 DirectX 11 (or DX10) is required.
 
 ---
-
-
-
+## An visual Example
+![Main pic](images/SpriteSheet Instancing showcase.png)
+Numberd by the Elements
+- A0: Normal rectangle from the sprite sheet
+- B0: Rotated by π/4
+- C7: Scaled up by 2 (X)
+- D0: Scaled up by 2 (Y)
+- G19: Vertical rectangle from the sprite sheet
+- F14: Standard rectangle from the sprite sheet
+- E13: Uniformly scaled up by 2 (X, Y)
+- H18: Horizontal rectangle from the sprite sheet
+- I10: Rotated rectangle
+- J10: Blue-tinted element
+- K10: Flipped Scale -1 (X, Y)
+- L10: Flipped vertically Scale 1, -1 (X, Y)
+- M11: Flipped horizontally Scale -1, 1 (X, Y)
 ---
 ## Pros
 - Enables efficient mass instancing of rectangles from a single sprite sheet.
