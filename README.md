@@ -42,7 +42,7 @@ Numbered by the Elements:
   <img src="images/500 Elements with Spritebatch DepthStencilState.None about 1.2 ms.PNG" width="45%" />
 </p>
 
-This example demonstrates the performance difference between SpriteBatch and SpriteSheet Instancing.
+This example demonstrates the (CPU) performance difference between SpriteBatch and SpriteSheet Instancing.
 Using a single 4K sprite sheet and random positions:
 - SpriteBatch can draw 500 rectangles from the sprite sheet in approximately 1.2 ms.
 - SpriteSheet Instancing can draw 42,000 rectangles from the same sprite sheet in about 1.2 ms.
