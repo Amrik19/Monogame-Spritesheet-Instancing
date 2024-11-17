@@ -28,8 +28,8 @@ The SpriteSheet class, paired with the instancing shader, enables efficient mass
 
 This example demonstrates the performance difference between SpriteBatch and SpriteSheet Instancing.
 Using a single 4K sprite sheet and random positions:
--SpriteBatch can draw 500 rectangles from the sprite sheet in approximately 1.2 ms.
--SpriteSheet Instancing can draw 42,000 rectangles from the same sprite sheet in about 1.2 ms.
+- SpriteBatch can draw 500 rectangles from the sprite sheet in approximately 1.2 ms.
+- SpriteSheet Instancing can draw 42,000 rectangles from the same sprite sheet in about 1.2 ms.
 
 
 
