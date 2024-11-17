@@ -10,7 +10,8 @@ DirectX 11 (or DX10) is required.
 
 ---
 ## An visual Example
-![Main pic](images/SpriteSheet Instancing showcase.png)
+![showcase pic](images/SpriteSheet Instancing showcase.png)
+
 Numberd by the Elements
 - A0: Normal rectangle from the sprite sheet
 - B0: Rotated by π/4
