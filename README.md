@@ -104,5 +104,5 @@ Using a single 4K sprite sheet and random positions:
 ---
 ## The Spritesheet
 ![Main pic](images/CustomUVChecker_byValle_4K.png)
-The sprite sheet was created using VINZI's SpriteSheet Generator.
+The sprite sheet was created using VINZI's UV Generator.
 [Visit VINZI´s site](https://uvchecker.vinzi.xyz) to learn more.
