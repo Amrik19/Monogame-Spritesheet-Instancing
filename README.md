@@ -97,6 +97,7 @@ Using a single 4K sprite sheet and random positions:
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
 ---
 ## How to Use the Class
+
 1 - Set the MonoGame GraphicsProfile to HiDef in your game instance: _graphics.GraphicsProfile = GraphicsProfile.HiDef;
 2 - Create a new instance of the SpritesheetInstancing class. (note: no Texture2D is required at this point, but it can be provided later in the Begin() method)
 3 - Call the Begin() method to prepare the instancing process by initializing the internal data with the specified spritesheet and optional rendering states. You can also define the number of elements for optimization.
