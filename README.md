@@ -23,7 +23,7 @@ The SpriteSheet class, paired with the instancing shader, enables efficient mass
   <img src="images/42k Instances with SpritesheetInstancing  DepthStencilState.None about 1.2 ms.PNG" width="45%" />
   <img src="images/500 Elements with Spritebatch DepthStencilState.None about 1.2 ms.PNG" width="45%" />
 </p>
-##Example
+## Example
 
 This example demonstrates the performance difference between SpriteBatch and SpriteSheet Instancing.
 Using a single 4K sprite sheet and random positions:
