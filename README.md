@@ -37,8 +37,8 @@ The SpriteSheet Instancing class uses following Methods
   - Cant be called between Begin() and End()
 
  - ChangeSpritesheetUnsave()
-  -  Changes the Texture2D of the class
-  -   Can be called between Begin() and End()
+ - Changes the Texture2D of the class
+ - Can be called between Begin() and End()
 
 - LoadShaderAndTexture()
   - Loads the shader and Texture2D
