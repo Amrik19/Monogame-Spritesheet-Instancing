@@ -1,12 +1,10 @@
 # Monogame-Spritesheet-Instancing
 An efficient SpriteSheet Instancing class and shader inspired by MonoGame's SpriteBatch, supporting high-performance rendering and instancing for large-scale 2D projects.
 
-
 ![Main pic](images/SpriteSheet%20Instancing%20Pic.PNG)
-
-
 ---
-The
+The SpriteSheet class, paired with the instancing shader, enables efficient mass instancing of 2D objects from a sprite sheet. It offers SpriteBatch-like methods for ease of use. The class supports a single texture at a time, requiring swaps for different sprite sheets. DirectX 11 (or DX10) is required.
+
 ---
 ## Pros
 - Enables efficient mass instancing of rectangles from a single sprite sheet.
