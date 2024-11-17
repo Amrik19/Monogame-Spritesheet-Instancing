@@ -19,12 +19,11 @@ The SpriteSheet class, paired with the instancing shader, enables efficient mass
 - Draw calls must be manually ordered for proper rendering (back-to-front).
 - Custom shaders must be built on top of the SpriteSheet Instancing Shader.
 ---
+## Example
 <p float="left">
   <img src="images/42k Instances with SpritesheetInstancing  DepthStencilState.None about 1.2 ms.PNG" width="45%" />
   <img src="images/500 Elements with Spritebatch DepthStencilState.None about 1.2 ms.PNG" width="45%" />
 </p>
-
-## Example
 
 This example demonstrates the performance difference between SpriteBatch and SpriteSheet Instancing.
 Using a single 4K sprite sheet and random positions:
