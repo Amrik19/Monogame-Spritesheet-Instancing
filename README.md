@@ -4,7 +4,7 @@ An efficient SpriteSheet Instancing class and shader inspired by MonoGame's Spri
 ![Main pic](images/SpriteSheet%20Instancing%20Pic.PNG)
 ---
 The SpriteSheet class, paired with the instancing shader, enables efficient mass instancing of 2D objects from a sprite sheet. It offers SpriteBatch-like methods for ease of use. The class supports a single texture at a time, requiring swaps for different sprite sheets. DirectX 11 (or DX10) is required.
-
+---
 
 
 
@@ -29,24 +29,24 @@ This example demonstrates the performance difference between SpriteBatch and Spr
 Using a single 4K sprite sheet and random positions:
 - SpriteBatch can draw 500 rectangles from the sprite sheet in approximately 1.2 ms.
 - SpriteSheet Instancing can draw 42,000 rectangles from the same sprite sheet in about 1.2 ms.
-
-
-
-
+  
 ---
 ## The SpriteSheet Instancing class uses following Methods
 **- Begin()**
    - Similar to MonoGame's SpriteBatch, this method collects instances into an array.  
    - These instances are later sent to the graphics card using a (Vertex) Instancing Buffer for efficient rendering.
    - Includes an overload for changing the texture.
+   - Begin(Texture2D, Matrix, Blendstate, Samplestate, DepthStencilState, Rasterstate)
 
 **- Draw()**
-   - Offers various overloads.
    - Positions the sprite(rectangle) at its center by default.
+   - Offers various overloads.   
+   - Draw(Vector2 position, Rectangle, rotation, Vector2 scale, Color)
 
 **- DrawTopLeft()**
-   - Offers various overloads.
    - Positions the sprite(rectangle) with the top-left corner as the origin.
+   - Offers various overloads.
+   - DrawTopLeft(Vector2 position, Rectangle, Vector2 scale, Color)
  
 **- End()**
    - Sends the collected instances to the graphics card using a (Vertex) Instancing Buffer.
@@ -78,3 +78,14 @@ Using a single 4K sprite sheet and random positions:
    - Loads the shader.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
 ---
+## Aditional Info
+- The view matrix functions like MonoGame's SpriteBatch, with support for custom matrices provided at the Begin() method.
+- It is recommended to manually set the numberOfInstances to avoid automatic resizing of the internal array, especially when working with large numbers of elements.
+  - Note that the numberOfInstances can be set higher than the actual required amount.
+- 
+- 
+---
+## The Spritesheet
+![Main pic](images/CustomUVChecker_byValle_4K.png)
+The sprite sheet was created using VINZI's SpriteSheet Generator.
+[Visit VINZI´s site](https://uvchecker.vinzi.xyz) to learn more.
