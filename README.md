@@ -3,7 +3,7 @@
 
 ![Main pic](images/SpriteSheet%20Instancing%20Pic.PNG)
 
-The SpriteSheet class, paired with the instancing shader, enables efficient mass instancing of 2D objects from a sprite sheet. It offers SpriteBatch-like methods for ease of use. The class supports a single texture at a time, requiring swaps for different sprite sheets. DirectX 11 (or DX10) is required.
+The SpriteSheet class, paired with the instancing shader, enables efficient instancing of 2D objects from a sprite sheet. It offers SpriteBatch-like methods for ease of use. The class supports a single texture at a time, requiring swaps for different sprite sheets. DirectX 11 (or DX10) is required.
 
 ---
 ## Pros
