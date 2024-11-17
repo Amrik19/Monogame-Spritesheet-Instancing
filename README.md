@@ -21,7 +21,7 @@ The SpriteSheet class, paired with the instancing shader, enables efficient mass
 ---
 <p float="left">
   <img src="images/42k Instances with SpritesheetInstancing  DepthStencilState.None about 1.2 ms.PNG" width="45%" />
-  <img src="images/500 Elements with Spritebatch DepthStencilState.None about 1.2 ms.PNG="45%" />
+  <img src="images/500 Elements with Spritebatch DepthStencilState.None about 1.2 ms.PNG" width="45%" />
 </p>
 
 
