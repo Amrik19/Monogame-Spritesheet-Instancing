@@ -10,7 +10,7 @@ DirectX 11 (or DX10) is required.
 
 ---
 ## An visual Example
-![showcase pic](images/SpriteSheet Instancing showcase.png)
+![showcase pic](images/SpriteSheet%20Instancing%20showcase.png)
 
 Numberd by the Elements
 - A0: Normal rectangle from the sprite sheet
