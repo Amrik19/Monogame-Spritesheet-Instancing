@@ -6,46 +6,46 @@ An efficient SpriteSheet Instancing class and shader inspired by MonoGame's Spri
 
 ---
 ## The SpriteSheet Instancing class uses following Methods
-- Begin()
+#- Begin()
    - Similar to MonoGame's SpriteBatch, this method collects instances into an array.  
    - These instances are later sent to the graphics card using a (Vertex) Instancing Buffer for efficient rendering.
    - Includes an overload for changing the texture.
 
-- Draw()
+#- Draw()
    - Offers various overloads.
    - Positions the sprite(rectangle) at its center by default.
 
-- DrawTopLeft()
+#- DrawTopLeft()
    - Offers various overloads.
    - Positions the sprite(rectangle) with the top-left corner as the origin.
  
-- End()
+#- End()
    - Sends the collected instances to the graphics card using a (Vertex) Instancing Buffer.
 
-- UpdateViewPort()
+#- UpdateViewPort()
    - Updates the viewport settings.
    - Essential for maintaining accurate scaling and functionality when the game window size changes.
     
-- ReturnSpritesheet()
+#- ReturnSpritesheet()
    - Returns the current Texture2D associated with the class.
  
-- ChangeSpritesheet()
+#- ChangeSpritesheet()
    - Changes the Texture2D associated with the class.
    - Cannot be called between Begin() and End().
 
- - ChangeSpritesheetUnsave()
+#- ChangeSpritesheetUnsave()
    - Changes the Texture2D associated with the class.
    - Can be called between Begin() and End().
   
-- Dispose()
+#- Dispose()
    - Releases the Vertex and Index Buffers.
    - Should be called when the SpriteSheet instance is no longer needed.
 
-- LoadShaderAndTexture()
+#- LoadShaderAndTexture()
    - Loads the shader and the Texture2D.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
  
-- LoadShader()
+#- LoadShader()
    - Loads the shader.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
 ---
