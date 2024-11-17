@@ -65,12 +65,12 @@ namespace Monogame.SpritesheetInstancing
 
             public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(
                 new VertexElement(0, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1),  //4 byte TEXCOORD1
-                new VertexElement(4, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 2),  //4 byte TEXCOORD1
+                new VertexElement(4, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 2),  //4 byte TEXCOORD2
                 new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 1),               //4 byte COLOR1
-                new VertexElement(12, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 3), //4 byte TEXCOORD2
-                new VertexElement(16, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 4), //4 byte TEXCOORD3
+                new VertexElement(12, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 3), //4 byte TEXCOORD3
+                new VertexElement(16, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 4), //4 byte TEXCOORD4
                 new VertexElement(20, VertexElementFormat.Vector2, VertexElementUsage.Position, 1),         //8 byte POSITION1
-                new VertexElement(28, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 5) //8 byte TEXCOORD4
+                new VertexElement(28, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 5) //8 byte TEXCOORD5
             );
 
             /// <summary>
