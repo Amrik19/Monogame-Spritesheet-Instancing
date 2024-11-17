@@ -18,7 +18,7 @@ The SpriteSheet class, paired with the instancing shader, enables efficient inst
 ---
 
 
-## A visual Example
+## A Visual Example
 ![showcase pic](images/SpriteSheet%20Instancing%20showcase.png)
 
 Numberd by the Elements
