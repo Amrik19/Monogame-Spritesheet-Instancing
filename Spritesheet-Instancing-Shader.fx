@@ -70,8 +70,8 @@ PixelInput SpriteVertexShader(VertexInput v, InstanceInput i)
     float shiftDirectionY = sign(v.V_Position.y);
     
     // Gets the right size of the Spritesheet element
-    v.V_Position.x = shiftDirectionX * rectangleW / 2 * i.I_Scale;
-    v.V_Position.y = shiftDirectionY * rectangleH / 2 * i.I_Scale;
+    v.V_Position.x = shiftDirectionX * rectangleW / 2 * i.I_Scale.x;
+    v.V_Position.y = shiftDirectionY * rectangleH / 2 * i.I_Scale.y;
     
     // Rotate vertex around the rectangle center(origin (0.0)) with the Rotationmatrix
     float2x2 matr = getRotationMatrix(i.I_Rotation);
