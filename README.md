@@ -3,6 +3,18 @@ An efficient SpriteSheet Instancing class and shader inspired by MonoGame's Spri
 
 ![Main pic](images/SpriteSheet%20Instancing%20Pic.PNG)
 ---
+## Pros
+- Enables efficient mass instancing of rectangles from a single sprite sheet.
+- Achieves up to 80x better CPU efficiency compared to SpriteBatch using the same sprite sheet.
+
+## Cons
+- Requires DirectX 11 (or DX10).
+- Supports only one sprite sheet (texture) per draw call.
+- Draw calls must be manually ordered for proper rendering (back-to-front).
+---
+
+
+
 
 
 
