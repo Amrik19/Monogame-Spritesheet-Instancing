@@ -5,7 +5,7 @@ An efficient SpriteSheet Instancing class and shader inspired by MonoGame's Spri
 
 
 ---
-The SpriteSheet Instancing class uses following Methods
+## The SpriteSheet Instancing class uses following Methods
 - Begin()
    - Similar to MonoGame's SpriteBatch, this method collects instances into an array.  
    - These instances are later sent to the graphics card using a (Vertex) Instancing Buffer for efficient rendering.
