@@ -7,8 +7,19 @@ An efficient SpriteSheet Instancing class and shader inspired by MonoGame's Spri
 The SpriteSheet class, paired with the instancing shader, enables efficient mass instancing of 2D objects from a sprite sheet. It offers SpriteBatch-like methods for ease of use. 
 The class supports a single texture at a time, requiring swaps for different sprite sheets. 
 DirectX 11 (or DX10) is required.
-
 ---
+## Pros
+- Enables efficient mass instancing of rectangles from a single sprite sheet.
+- Achieves up to 80x better CPU efficiency compared to SpriteBatch using the same sprite sheet.
+
+## Cons
+- Requires DirectX 11 (or DX10).
+- Supports only one sprite sheet (texture) per draw call.
+- Draw calls must be manually ordered for proper rendering (back-to-front).
+- Custom shaders must be built on top of the SpriteSheet Instancing Shader.
+---
+
+
 ## An visual Example
 ![showcase pic](images/SpriteSheet%20Instancing%20showcase.png)
 
@@ -26,16 +37,6 @@ Numberd by the Elements
 - K10: Flipped Scale -1 (X, Y)
 - L10: Flipped vertically Scale 1, -1 (X, Y)
 - M11: Flipped horizontally Scale -1, 1 (X, Y)
----
-## Pros
-- Enables efficient mass instancing of rectangles from a single sprite sheet.
-- Achieves up to 80x better CPU efficiency compared to SpriteBatch using the same sprite sheet.
-
-## Cons
-- Requires DirectX 11 (or DX10).
-- Supports only one sprite sheet (texture) per draw call.
-- Draw calls must be manually ordered for proper rendering (back-to-front).
-- Custom shaders must be built on top of the SpriteSheet Instancing Shader.
 ---
 ## Example
 <p float="left">
@@ -96,6 +97,7 @@ Using a single 4K sprite sheet and random positions:
    - Loads the shader.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
 ---
+
 ## Aditional Info
 - The view matrix functions like MonoGame's SpriteBatch, with support for custom matrices provided at the Begin() method.
 - It is recommended to manually set the numberOfInstances to avoid automatic resizing of the internal array, especially when working with large numbers of elements.
