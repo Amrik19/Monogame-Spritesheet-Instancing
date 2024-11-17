@@ -100,8 +100,6 @@ Using a single 4K sprite sheet and random positions:
 - The view matrix functions like MonoGame's SpriteBatch, with support for custom matrices provided at the Begin() method.
 - It is recommended to manually set the numberOfInstances to avoid automatic resizing of the internal array, especially when working with large numbers of elements.
   - Note that the numberOfInstances can be set higher than the actual required amount.
-- 
-- 
 ---
 ## The Spritesheet
 ![Main pic](images/CustomUVChecker_byValle_4K.png)
