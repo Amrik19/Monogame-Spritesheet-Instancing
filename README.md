@@ -25,7 +25,7 @@ Numbered by the Elements:
 - A0:  Normal rectangle from the sprite sheet
 - B0:  Rotated by π/4
 - C7:  Scaled up by 2 (X)
-- D0:  Scaled up by 2 (Y)
+- D9:  Scaled up by 2 (Y)
 - G19: Vertical rectangle from the sprite sheet
 - F14: Standard rectangle from the sprite sheet
 - E13: Uniformly scaled up by 2 (X, Y)
