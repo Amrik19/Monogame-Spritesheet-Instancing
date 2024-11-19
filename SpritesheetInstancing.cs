@@ -20,8 +20,7 @@ namespace Monogame.SpritesheetInstancing
         private Effect spritesheetInstancingShader;
         private VertexBuffer vertexBuffer;
         private IndexBuffer indexBuffer;
-        private DynamicVertexBuffer dynamicinstancingBuffer;
-        private bool emptyBuffers;
+        private DynamicVertexBuffer dynamicinstancingBuffer;        
 
         // Array       
         private InstanceData[] instanceDataArray;   // Array for the Performance (List was slower by like 30%)
@@ -130,8 +129,7 @@ namespace Monogame.SpritesheetInstancing
             LoadShader(spritesheetInstancingShader);
             CreateBaseVertexAndIndexBuffer();
 
-            CreateStandardMatrix();
-            emptyBuffers = true;            
+            CreateStandardMatrix();                       
             
             // Create Array with a Space for 1 Element
             instanceDataArray = new InstanceData[1];
@@ -763,28 +761,26 @@ namespace Monogame.SpritesheetInstancing
             }
 
             // Sets the Instancingbuffer            
-            if (emptyBuffers)
+            // Dispose the buffer from the last Frame if the (vetex)instancingbuffer has changed
+            if (dynamicinstancingBuffer.VertexCount < instanceNumber)
             {
-                // Dispose the buffer from the last Frame if the (vetex)instancingbuffer has changed
-                if (dynamicinstancingBuffer.VertexCount < instanceNumber)
-                {
-                    dynamicinstancingBuffer?.Dispose();
-                    dynamicinstancingBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), instanceNumber, BufferUsage.WriteOnly);
-                }
-
-                // Fills the (vertex)instancingbuffer
-                dynamicinstancingBuffer.SetData(instanceDataArray, 0, instanceNumber, SetDataOptions.Discard);                
-
-                // Binds the vertexBuffers
-                graphicsDevice.SetVertexBuffers(new VertexBufferBinding[]
-                {
-                    new VertexBufferBinding(vertexBuffer, 0, 0), // Dreieck-Versetzungen
-                    new VertexBufferBinding(dynamicinstancingBuffer, 0, 1) // Instanzdaten
-                });
-
-                // Indexbuffer
-                graphicsDevice.Indices = indexBuffer;
+                dynamicinstancingBuffer?.Dispose();
+                dynamicinstancingBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), instanceNumber, BufferUsage.WriteOnly);
             }
+
+            // Fills the (vertex)instancingbuffer
+            dynamicinstancingBuffer.SetData(instanceDataArray, 0, instanceNumber, SetDataOptions.Discard);                
+
+            // Binds the vertexBuffers
+            graphicsDevice.SetVertexBuffers(new VertexBufferBinding[]
+            {
+                new VertexBufferBinding(vertexBuffer, 0, 0), // Dreieck-Versetzungen
+                new VertexBufferBinding(dynamicinstancingBuffer, 0, 1) // Instanzdaten
+            });
+
+            // Indexbuffer
+            graphicsDevice.Indices = indexBuffer;
+            
 
             // Paramethers to the shader
             // Viewport
