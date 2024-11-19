@@ -736,7 +736,7 @@ namespace Monogame.SpritesheetInstancing
         /// <summary>
         /// Adds the created Array from the draws methods together in a dynamic vertexbuffer(Instancingbuffer) for the single drawcall.
         /// </summary>
-        public void End(GraphicsDevice graphicsDevice)
+        public void End()
         {
             // Like Spritebatch
             if (!beginCalled)
