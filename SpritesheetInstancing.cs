@@ -12,9 +12,7 @@ namespace Monogame.SpritesheetInstancing
     /// </summary>
     public class SpritesheetInstancing
     {
-        // Viewport, Buffer, Shader
-        private RasterizerState rasterizer;
-        private SamplerState samplerState;
+        // Viewport, Buffer, Shader        
         private GraphicsDevice graphicsDevice;
         private Point viewPort;
         private Effect spritesheetInstancingShader;
