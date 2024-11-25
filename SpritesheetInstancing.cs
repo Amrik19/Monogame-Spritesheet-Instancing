@@ -326,19 +326,20 @@ namespace Monogame.SpritesheetInstancing
             transformMatrix = transforMatrix ?? likeSpritebatchEmptyMatrix; // Like the Spritebatch
 
             // Uses an Array if the number of elements are known
+            // If size of the Array is equal to the numbersOfElements the array keeps its size, no new allocation on the heap
             if (numberOfElements > 0)
             {
                 // Array size increase if number of Elements are bigger
                 if (instanceDataArray.Length < numberOfElements)
                 {
-                    Array.Resize(ref instanceDataArray, numberOfElements);
+                    instanceDataArray = new InstanceData[numberOfElements];
                 }              
                 instanceNumber = 0;
             }
-            // Resize the Array (Capacity not known)
+            // Resize the Array (Capacity not known)            
             else
             {
-                Array.Resize(ref instanceDataArray, 1);
+                instanceDataArray = new InstanceData[1];
                 instanceNumber = 0;
             }
         }
@@ -378,21 +379,22 @@ namespace Monogame.SpritesheetInstancing
             transformMatrix = transforMatrix ?? likeSpritebatchEmptyMatrix; // Like the Spritebatch
 
             // Uses an Array if the number of elements are known
+            // If size of the Array is equal to the numbersOfElements the array keeps its size, no new allocation on the heap
             if (numberOfElements > 0)
             {
                 // Array size increase if number of Elements are bigger
                 if (instanceDataArray.Length < numberOfElements)
                 {
-                    Array.Resize(ref instanceDataArray, numberOfElements);
-                }
+                    instanceDataArray = new InstanceData[numberOfElements];
+                }              
                 instanceNumber = 0;
             }
-            // Resize the Array (Capacity not known)
+            // Resize the Array (Capacity not known)            
             else
             {
-                Array.Resize(ref instanceDataArray, 1);
+                instanceDataArray = new InstanceData[1];
                 instanceNumber = 0;
-            }
+            }            
         }
 
         /// <summary>
