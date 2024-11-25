@@ -107,8 +107,9 @@ Using a single 4K sprite sheet and random positions:
 ---
 ## Aditional Info
 - The view matrix functions like MonoGame's SpriteBatch, with support for custom matrices provided at the Begin() method.
-- It is recommended to manually set the numberOfInstances to avoid automatic resizing of the internal array, especially when working with large numbers of elements.
-  - Note that the numberOfInstances can be set higher than the actual required amount.
+- It is recommended to manually set the numberOfInstances to avoid automatic resizing of the internal array, especially when working with large numbers of elements.  
+  - If a single instance of the Spritesheet Instancing class is used across multiple Begin() calls, it is recommended to set the numberOfElements to the same value for each call. Ideally, use a size equal to or greater than the maximum expected number of elements. This prevents the class from creating new arrays every frame, reducing unnecessary allocations and minimizing work for the Garbage Collector.
+  - Note that the NumberOfElements can be set higher than the actual required amount.
 ---
 ## The Spritesheet
 ![Main pic](images/CustomUVChecker_byValle_4K.png)
