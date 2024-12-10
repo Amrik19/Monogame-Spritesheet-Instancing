@@ -3,8 +3,8 @@
 
 ![Main pic](images/SpriteSheet%20Instancing%20Pic.PNG)
 
-The SpritesheetInstancing class, when used with the instancing shader, enables efficient instancing of 2D objects from a sprite sheet. It provides SpriteBatch-like methods for ease of use but supports only one texture at a time, requiring texture swaps for different sprite sheets. DirectX 11 (or DX10) is required.
-The SpritesheetInstancingAdv class extends this functionality, supporting instancing from multiple sprite sheets. In this version, draw calls are ordered by texture in the internal Texture2D array (i.e., all draw calls for the first texture are executed first, followed by the second texture, and so on).
+- The SpritesheetInstancing class, when used with the instancing shader, enables efficient instancing of 2D objects from a sprite sheet. It provides SpriteBatch-like methods for ease of use but supports only one texture at a time, requiring texture swaps for different sprite sheets. DirectX 11 (or DX10) is required.
+- The SpritesheetInstancingAdv class extends this functionality, supporting instancing from multiple sprite sheets. In this version, draw calls are ordered by texture in the internal Texture2D array (i.e., all draw calls for the first texture are executed first, followed by the second texture, and so on).
 
 ---
 ## Pros
