@@ -1,0 +1,4 @@
+This folder contains the base MonoGame Spritesheet Instancing class.
+This class supports only one spritesheet at a time.
+
+The advanced MonoGame Spritesheet Instancing class extends the base class and includes additional functionality, allowing the use of multiple spritesheets.
