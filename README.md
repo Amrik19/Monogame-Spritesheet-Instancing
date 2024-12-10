@@ -3,7 +3,8 @@
 
 ![Main pic](images/SpriteSheet%20Instancing%20Pic.PNG)
 
-The SpriteSheet class, paired with the instancing shader, enables efficient instancing of 2D objects from a sprite sheet. It offers SpriteBatch-like methods for ease of use. The class supports a single texture at a time, requiring swaps for different sprite sheets. DirectX 11 (or DX10) is required.
+The SpritesheetInstancing class, when used with the instancing shader, enables efficient instancing of 2D objects from a sprite sheet. It provides SpriteBatch-like methods for ease of use but supports only one texture at a time, requiring texture swaps for different sprite sheets. DirectX 11 (or DX10) is required.
+The SpritesheetInstancingAdv class extends this functionality, supporting instancing from multiple sprite sheets. In this version, draw calls are ordered by texture in the internal Texture2D array (i.e., all draw calls for the first texture are executed first, followed by the second texture, and so on).
 
 ---
 ## Pros
@@ -12,7 +13,7 @@ The SpriteSheet class, paired with the instancing shader, enables efficient inst
 
 ## Cons
 - Requires DirectX 11 (or DX10).
-- Supports only one sprite sheet (texture) per draw call.
+- Supports only one sprite sheet (texture) per draw call. (Only the SpritesheetInstancing class)
 - Draw calls must be manually ordered for proper rendering (back-to-front).
 - Custom shaders must be built on top of the SpriteSheet Instancing Shader.
 ---
@@ -92,6 +93,56 @@ Using a single 4K sprite sheet and random positions:
    - Loads the shader and the Texture2D.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
  
+**- LoadShader()**
+   - Loads the shader.
+   - Custom shaders should build on top of the SpriteSheet Instancing Shader.
+---
+## The SpriteSheet Instancing Advanced class uses following Methods
+**- Begin()**
+   - Similar to MonoGame's SpriteBatch, this method collects instances into seperate arrays for each spritesheet/texture in the internal texture array.  
+   - These instances are later sent to the graphics card using a (Vertex) Instancing Buffer for efficient rendering.
+   - Begin(Matrix, Blendstate, Samplestate, DepthStencilState, Rasterstate)
+
+**- Draw()**
+   - Positions the sprite(rectangle) at its center by default.
+   - Offers various overloads.   
+   - Draw(Texture2D texture, Vector2 position, Rectangle, rotation, Vector2 scale, Color)
+
+**- DrawUnsave()**
+   - Positions the sprite(rectangle) at its center by default.
+   - Offers various overloads.   
+   - Draw(int textureIndex, Vector2 position, Rectangle, rotation, Vector2 scale, Color)
+
+**- DrawTopLeft()**
+   - Positions the sprite(rectangle) with the top-left corner as the origin.
+   - Offers various overloads.
+   - DrawTopLeft(Texture2D texture, Vector2 position, Rectangle, Vector2 scale, Color)
+
+**- DrawTopLeftUnsave()**
+   - Positions the sprite(rectangle) with the top-left corner as the origin.
+   - Offers various overloads.
+   - DrawTopLeft(int textureIndex, Vector2 position, Rectangle, Vector2 scale, Color)
+
+**- End()**
+   - Sends the collected instances to the graphics card using a (Vertex) Instancing Buffer.
+   - A separate draw call is made for each texture in the internal Texture2D array.
+
+**- UpdateViewPort()**
+   - Updates the viewport settings.
+   - Essential for maintaining accurate scaling and functionality when the game window size changes.
+
+
+**- ReturnSpritesheets()**
+   - Returns the current Texture2D array associated with the class.
+
+**- ChangeSpritesheet()**
+   - Changes the Texture2D array associated with the class.
+   - Cannot be called between Begin() and End().
+
+**- Dispose()**
+   - Releases the Vertex and Index Buffers.
+   - Should be called when the SpriteSheet instance is no longer needed.
+
 **- LoadShader()**
    - Loads the shader.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
