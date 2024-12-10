@@ -946,7 +946,7 @@ namespace MonoGame.SpritesheetInstancing
         {
             if (beginCalled)
             {
-                throw new InvalidOperationException("Spritesheet swap mid draw is not recomended. Use ChangeSpritesheetUnsave()");
+                throw new InvalidOperationException("Spritesheet(s) swap mid draw is not possible.");
             }
 
             this.spriteSheets = spriteSheets;
