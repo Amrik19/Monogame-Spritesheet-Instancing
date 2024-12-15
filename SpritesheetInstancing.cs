@@ -816,7 +816,7 @@ namespace MonoGame.SpritesheetInstancing
         private int[] instanceNumbers;
 
         // Spritesheets
-        private Texture2D[] spriteSheets; // To do array an texturen
+        private Texture2D[] spriteSheets;
         public bool hasSpritesheets { get; private set; }
         private Point[] spritesheetWidthAndHeight;
 
