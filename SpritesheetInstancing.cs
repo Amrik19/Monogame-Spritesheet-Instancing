@@ -403,7 +403,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].Color = Color.White;
             instanceDataArray[instanceNumber].RectangleXY = 0;
             instanceDataArray[instanceNumber].RectangleWH = (spritesheetWidth << 16) | (spritesheetHeight & 65535);
-            instanceDataArray[instanceNumber].Position = new Vector2(spritesheetWidth / 2, spritesheetHeight / 2);
+            instanceDataArray[instanceNumber].Position = new Vector2(spritesheetWidth / 2f, spritesheetHeight / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
             
             instanceNumber++;
@@ -428,7 +428,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].Color = Color.White;
             instanceDataArray[instanceNumber].RectangleXY = 0;
             instanceDataArray[instanceNumber].RectangleWH = (spritesheetWidth << 16) | (spritesheetHeight & 65535);
-            instanceDataArray[instanceNumber].Position = position + new Vector2(spritesheetWidth / 2, spritesheetHeight / 2);
+            instanceDataArray[instanceNumber].Position = position + new Vector2(spritesheetWidth / 2f, spritesheetHeight / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
             
             instanceNumber++;
@@ -454,7 +454,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].Color = color;
             instanceDataArray[instanceNumber].RectangleXY = 0;
             instanceDataArray[instanceNumber].RectangleWH = (spritesheetWidth << 16) | (spritesheetHeight & 65535);
-            instanceDataArray[instanceNumber].Position = position + new Vector2(spritesheetWidth / 2, spritesheetHeight / 2);
+            instanceDataArray[instanceNumber].Position = position + new Vector2(spritesheetWidth / 2f, spritesheetHeight / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
 
             instanceNumber++;
@@ -480,7 +480,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].Color = Color.White;
             instanceDataArray[instanceNumber].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataArray[instanceNumber].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2, rectangle.Height / 2);
+            instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2f, rectangle.Height / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
             
             instanceNumber++;
@@ -507,7 +507,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].Color = color;
             instanceDataArray[instanceNumber].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataArray[instanceNumber].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2, rectangle.Height / 2);
+            instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2f, rectangle.Height / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
             
             instanceNumber++;
@@ -534,7 +534,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].Color = Color.White;
             instanceDataArray[instanceNumber].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataArray[instanceNumber].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2 * MathF.Abs(scale.X), rectangle.Height / 2 * MathF.Abs(scale.Y));
+            instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2f * MathF.Abs(scale.X), rectangle.Height / 2f * MathF.Abs(scale.Y));
             instanceDataArray[instanceNumber].Scale = scale;
 
             instanceNumber++;
@@ -562,7 +562,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].Color = color;
             instanceDataArray[instanceNumber].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataArray[instanceNumber].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2 * MathF.Abs(scale.X), rectangle.Height / 2 * MathF.Abs(scale.Y));
+            instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2f * MathF.Abs(scale.X), rectangle.Height / 2f * MathF.Abs(scale.Y));
             instanceDataArray[instanceNumber].Scale = scale;
 
             instanceNumber++;
@@ -1117,7 +1117,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = Color.White;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = 0;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (spritesheetWidthAndHeight[textureIndex].X << 16) | (spritesheetWidthAndHeight[textureIndex].Y & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2, spritesheetWidthAndHeight[textureIndex].Y / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2f, spritesheetWidthAndHeight[textureIndex].Y / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1150,7 +1150,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = Color.White;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = 0;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (spritesheetWidthAndHeight[textureIndex].X << 16) | (spritesheetWidthAndHeight[textureIndex].Y & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2, spritesheetWidthAndHeight[textureIndex].Y / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2f, spritesheetWidthAndHeight[textureIndex].Y / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1184,7 +1184,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = color;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = 0;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (spritesheetWidthAndHeight[textureIndex].X << 16) | (spritesheetWidthAndHeight[textureIndex].Y & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2, spritesheetWidthAndHeight[textureIndex].Y / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2f, spritesheetWidthAndHeight[textureIndex].Y / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1218,7 +1218,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = Color.White;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2, rectangle.Height / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2f, rectangle.Height / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1253,7 +1253,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = color;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2, rectangle.Height / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2f, rectangle.Height / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1288,7 +1288,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = Color.White;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2 * MathF.Abs(scale.X), rectangle.Height / 2 * MathF.Abs(scale.Y));
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2f * MathF.Abs(scale.X), rectangle.Height / 2f * MathF.Abs(scale.Y));
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = scale;
 
             instanceNumbers[textureIndex]++;
@@ -1324,7 +1324,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = color;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2 * MathF.Abs(scale.X), rectangle.Height / 2 * MathF.Abs(scale.Y));
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2f * MathF.Abs(scale.X), rectangle.Height / 2f * MathF.Abs(scale.Y));
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = scale;
 
             instanceNumbers[textureIndex]++;
@@ -1366,7 +1366,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = Color.White;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = 0;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (spritesheetWidthAndHeight[textureIndex].X << 16) | (spritesheetWidthAndHeight[textureIndex].Y & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2, spritesheetWidthAndHeight[textureIndex].Y / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2f, spritesheetWidthAndHeight[textureIndex].Y / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1407,7 +1407,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = Color.White;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = 0;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (spritesheetWidthAndHeight[textureIndex].X << 16) | (spritesheetWidthAndHeight[textureIndex].Y & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2, spritesheetWidthAndHeight[textureIndex].Y / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2f, spritesheetWidthAndHeight[textureIndex].Y / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1449,7 +1449,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = color;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = 0;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (spritesheetWidthAndHeight[textureIndex].X << 16) | (spritesheetWidthAndHeight[textureIndex].Y & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2, spritesheetWidthAndHeight[textureIndex].Y / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(spritesheetWidthAndHeight[textureIndex].X / 2f, spritesheetWidthAndHeight[textureIndex].Y / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1491,7 +1491,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = Color.White;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2, rectangle.Height / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2f, rectangle.Height / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1534,7 +1534,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = color;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2, rectangle.Height / 2);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2f, rectangle.Height / 2f);
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
 
             instanceNumbers[textureIndex]++;
@@ -1577,7 +1577,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = Color.White;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2 * MathF.Abs(scale.X), rectangle.Height / 2 * MathF.Abs(scale.Y));
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2f * MathF.Abs(scale.X), rectangle.Height / 2f * MathF.Abs(scale.Y));
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = scale;
 
             instanceNumbers[textureIndex]++;
@@ -1621,7 +1621,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = color;
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = (rectangle.X << 16) | (rectangle.Y & 65535); // Moving the right part of x (16bits) to the left and add the right part of y (16bits) with a mask (65535) together
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
-            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2 * MathF.Abs(scale.X), rectangle.Height / 2 * MathF.Abs(scale.Y));
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position + new Vector2(rectangle.Width / 2f * MathF.Abs(scale.X), rectangle.Height / 2f * MathF.Abs(scale.Y));
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = scale;
 
             instanceNumbers[textureIndex]++;
