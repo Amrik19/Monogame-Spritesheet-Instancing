@@ -50,6 +50,11 @@ Using a single 4K sprite sheet and random positions:
   
 ---
 ## The SpriteSheet Instancing class uses following Methods
+**- UpdateViewPort()**
+  - Updates the viewport settings.
+  - Essential for maintaining accurate scaling and functionality when the game window size changes.
+  - Must be called after a resolution change, prior to Begin().
+
 **- Begin()**
    - Similar to MonoGame's SpriteBatch, this method collects instances into an array.  
    - These instances are later sent to the graphics card using a (Vertex) Instancing Buffer for efficient rendering.
@@ -68,11 +73,6 @@ Using a single 4K sprite sheet and random positions:
  
 **- End()**
    - Sends the collected instances to the graphics card using a (Vertex) Instancing Buffer.
-
-**- UpdateViewPort()**
-   - Updates the viewport settings.
-   - Essential for maintaining accurate scaling and functionality when the game window size changes.
-
     
 **- ReturnSpritesheet()**
    - Returns the current Texture2D associated with the class.
@@ -96,8 +96,22 @@ Using a single 4K sprite sheet and random positions:
 **- LoadShader()**
    - Loads the shader.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
+
+**- InternalArraySize()**
+  - Returns the current size of the internal instancing array.
+
+**- SetInternalArraySizes()**
+  - Sets the internal instancing array to a fixed size.
+  - By default, the array starts at size 1 and grows dynamically as needed.
+  - Can not be called during a draw call (Begin() and End()).
+
 ---
 ## The SpriteSheet Instancing Advanced class uses following Methods
+**- UpdateViewPort()**
+  - Updates the viewport settings.
+  - Essential for maintaining accurate scaling and functionality when the game window size changes.
+  - Must be called after a resolution change, prior to Begin().
+
 **- Begin()**
    - Similar to MonoGame's SpriteBatch, this method collects instances into seperate arrays for each spritesheet/texture in the internal texture array.  
    - These instances are later sent to the graphics card using a (Vertex) Instancing Buffer for efficient rendering.
@@ -127,17 +141,23 @@ Using a single 4K sprite sheet and random positions:
    - Sends the collected instances to the graphics card using a (Vertex) Instancing Buffer.
    - A separate draw call is made for each texture in the internal Texture2D array.
 
-**- UpdateViewPort()**
-   - Updates the viewport settings.
-   - Essential for maintaining accurate scaling and functionality when the game window size changes.
-
-
 **- ReturnSpritesheets()**
    - Returns the current Texture2D array associated with the class.
 
 **- ChangeSpritesheet()**
    - Changes the Texture2D array associated with the class.
    - Cannot be called between Begin() and End().
+
+**- AddSpriteSheet()**
+   - Adds a texture/spritesheet to the internal array.
+   - Cannot be called between Begin() and End().
+
+**- RemoveSpritesheet()**
+   - Removes the texture/spritesheet from the internal array, if present.
+   - Cannot be called between Begin() and End().
+
+**- HasSpriteSheet()**
+   - Checks whether the given texture/spritesheet exists in the internal array.
 
 **- Dispose()**
    - Releases the Vertex and Index Buffers.
@@ -146,21 +166,34 @@ Using a single 4K sprite sheet and random positions:
 **- LoadShader()**
    - Loads the shader.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
+
+**- InternalArraySizes()**
+   - Returns an int[] array representing the sizes of the internal jagged instancing arrays.
+   - Each element corresponds to the size of a specific internal instancing array.
+
+**- SetInternalArraySizes()**
+   - Sets all internal instancing arrays to the specified size.
+   - Cannot be called between Begin() and End().
+
+**- SetSpecificInternalArraySizes()**
+   - Sets the internal instancing array at the given index to a specific size.
+   - Cannot be called between Begin() and End().
+
 ---
 ## How to Use the Class
 
  - Set the MonoGame GraphicsProfile to HiDef in your game instance: _graphics.GraphicsProfile = GraphicsProfile.HiDef;
- - Create a new instance of the SpritesheetInstancing class. (note: no Texture2D is required at this point, but it can be provided later in the Begin() method)
- - Call the Begin() method to prepare the instancing process by initializing the internal data with the specified spritesheet and optional rendering states. You can also define the number of elements for optimization.
+ - Create a new instance of the SpritesheetInstancing class. (note: no Texture2D is required at this point)
+ - Assign the texture or spritesheet to be used for instancing. Use ChangeSpritesheet() for SpritesheetInstancing, or ChangeSpritesheets() for SpritesheetInstancingAdv.
+ - Call UpdateViewPort() to ensure correct scaling. This must be done before calling Begin()
+ - Call the Begin() method to prepare the instancing process by initializing the internal data with the specified spritesheet(s) and optional rendering states.
  - Choose a sprite element from your spritesheet and render it using the Draw() method.
  - Finalize the draw call by calling the End() method.
 
 ---
 ## Aditional Info
 - The view matrix functions like MonoGame's SpriteBatch, with support for custom matrices provided at the Begin() method.
-- It is recommended to manually set the numberOfInstances to avoid automatic resizing of the internal array, especially when working with large numbers of elements.  
-  - If a single instance of the Spritesheet Instancing class or the Spritesheet Instancing Advanced class is used with multiple Begin() calls, it is recommended to set the numberOfElements to the same value for each call. Ideally, use a size equal to or greater than the maximum expected number of elements. This prevents the class from creating new arrays every frame, reducing unnecessary allocations and minimizing work for the Garbage Collector.
-  - Note that the NumberOfElements can be set higher than the actual required amount.
+- Manually setting the instance count using SetInternalArraySizes() helps avoid repeated automatic resizing during the first drawcall.
 ---
 ## The Spritesheet
 ![Main pic](images/CustomUVChecker_byValle_4K.png)
