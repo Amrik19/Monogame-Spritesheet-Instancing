@@ -4,7 +4,6 @@
 #define VS_SHADERMODEL vs_5_0 // Dx11
 #define PS_SHADERMODEL ps_5_0
 
-float2 DisplaySize;       // Size of the game in Pixel x and y (Not Monitor size, Gamesize!)
 float2 TextureSize;       // Spritesheet size in x and y
 float4x4 View_projection; // Matrix (I Testet, Translation, Scale, RotationZ(They are working like the Spritebatch))
 sampler TextureSampler : register(s0);
@@ -119,39 +118,12 @@ PixelInput SpriteVertexShader(VertexInput v, InstanceInput i)
     // [ 0  0  1  0 ]
     // [ 0  0  0  1 ]
     //
-    //---End About Matrix in Monogame---
-    
-    
-    
-    // ---Scale Matrix---
-    // Scales like the Monogame base Matrix in the right Displaysize
-    float aspecRatio = DisplaySize.x / DisplaySize.y;    
-    float scaleFactor = 2.0 / DisplaySize.y;
-    float x = scaleFactor / aspecRatio;
-    float y = scaleFactor;
-    float4x4 scalematrix = float4x4(
-    x , 0, 0, 0,
-    0, y , 0, 0,
-    0, 0, 1, 0,
-    -1, 1, 0, 1); // -1x, 1y translates the Origin to the top Left Corner
-    //---End Scale Matrix---
-    
-    //---Reverse Rotation--- (-r = r)
-    float3x3 rotationMatrix = float3x3(View_projection[0].xyz, View_projection[1].xyz, View_projection[2].xyz);
-    float3x3 invertedRotation = transpose(rotationMatrix);
-    View_projection[0].xyz = invertedRotation[0];
-    View_projection[1].xyz = invertedRotation[1];
-    View_projection[2].xyz = invertedRotation[2];
-    //---End of Reverse Rotation---    
-    
-    //--- Reverse y---
-    View_projection._42 = -View_projection._42; // Inverts the y input to -y
-    //--- End of Reverse y ---
-    
-    //---Multiply with the updatet (inverted) view Matrix
-    float4x4 finalMatrix = mul(View_projection, scalematrix);
-    v.V_Position = mul(v.V_Position, finalMatrix);
-    //---End of Viewmatrix
+    //---End About Matrix in Monogame--- 
+
+    // Matrixmultiplications are done in CreateRightMatrix() only 1 time   
+    //---Viewmatrix---
+    v.V_Position = mul(v.V_Position, View_projection);
+    //---End of Viewmatrix---
     
     //---Depthbuffer--- (Only useful with non Transparent Sprites)
     // Adjust height for the DepthStencilState (does somthing when DepthStencilState.Default is set)
