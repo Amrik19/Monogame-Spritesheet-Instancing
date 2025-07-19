@@ -183,9 +183,9 @@ Using a single 4K sprite sheet and random positions:
 ## How to Use the Class
 
  - Set the MonoGame GraphicsProfile to HiDef in your game instance: _graphics.GraphicsProfile = GraphicsProfile.HiDef;
- - Create a new instance of the SpritesheetInstancing class. (note: no Texture2D is required at this point)
+ - Create a new instance of the SpritesheetInstancing class. (note: no Texture2D is required at this point).
  - Assign the texture or spritesheet to be used for instancing. Use ChangeSpritesheet() for SpritesheetInstancing, or ChangeSpritesheets() for SpritesheetInstancingAdv.
- - Call UpdateViewPort() to ensure correct scaling. This must be done before calling Begin()
+ - Call UpdateViewPort() to ensure correct scaling. This must be done before calling Begin().
  - Call the Begin() method to prepare the instancing process by initializing the internal data with the specified spritesheet(s) and optional rendering states.
  - Choose a sprite element from your spritesheet and render it using the Draw() method.
  - Finalize the draw call by calling the End() method.
