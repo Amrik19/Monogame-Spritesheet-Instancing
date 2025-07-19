@@ -53,7 +53,7 @@ namespace MonoGame.SpritesheetInstancing
         private Effect spritesheetInstancingShader;
         private VertexBuffer vertexBuffer;
         private IndexBuffer indexBuffer;
-        private DynamicVertexBuffer dynamicinstancingBuffer;        
+        private DynamicVertexBuffer dynamicinstancingBuffer;
 
         // Array       
         private InstanceData[] instanceDataArray;   // Array for the Performance (List was slower by like 30%)
@@ -61,7 +61,7 @@ namespace MonoGame.SpritesheetInstancing
 
         // Spritesheet
         private Texture2D spriteSheet;
-        public bool hasSpritesheet {  get; private set; }
+        public bool hasSpritesheet { get; private set; }
         private int spritesheetWidth;
         private int spritesheetHeight;
 
@@ -103,8 +103,8 @@ namespace MonoGame.SpritesheetInstancing
             LoadShader(spritesheetInstancingShader);
             CreateBaseVertexAndIndexBuffer();
 
-            CreateStandardMatrix();                       
-            
+            CreateStandardMatrix();
+
             // Create Array with a Space for 1 Element
             instanceDataArray = new InstanceData[1];
         }
@@ -144,6 +144,107 @@ namespace MonoGame.SpritesheetInstancing
         private void CreateStandardMatrix()
         {
             likeSpritebatchEmptyMatrix = Matrix.Identity;
+        }
+
+        /// <summary>
+        /// Creates the right Matrix here instead of in the Shader for each vertex.
+        /// </summary>
+        /// <param name="transformMatrix"></param>
+        /// <returns></returns>
+        private Matrix CreateRightMatrix(Matrix transformMatrix)
+        {
+            //---About Matrix in Monogame---
+            // 
+            // Rotation Matrix 2x2, 4x4
+            // [ cos(ß)  -sin(ß) ]
+            // [ sin(ß)   cos(ß) ]
+            // 
+            // [ cos(ß)  -sin(ß)  0  0 ]
+            // [ sin(ß)   cos(ß)  0  0 ]
+            // [   0        0     1  0 ]
+            // [   0        0     0  1 ]
+            // 
+            // Scale Matrix 4x4 #3
+            //
+            // [ sX  0  0  0 ]
+            // [  0 sY  0  0 ]
+            // [  0  0 sZ  0 ]
+            // [  0  0  0  1 ]
+            //
+            // Translation Matrix normal  #1
+            // 
+            // [ 1  0  0  tx ] // Not used here
+            // [ 0  1  0  ty ]
+            // [ 0  0  1  tz ]
+            // [ 0  0  0  1  ]
+            //
+            // Translation Matrix used here #2
+            // 
+            // [ 1   0   0   0 ]
+            // [ 0   1   0   0 ]
+            // [ 0   0   1   0 ]
+            // [ tx  ty  tz  1 ]
+            //
+            // Identiity Matrix (#3) 
+            // 
+            // [ 1  0  0  0 ]
+            // [ 0  1  0  0 ]
+            // [ 0  0  1  0 ]
+            // [ 0  0  0  1 ]
+            //
+            //---End About Matrix in Monogame---
+
+            // ----- Reverse Rotation -----
+            Matrix rotationMatrix = new Matrix();
+            rotationMatrix.M11 = transformMatrix.M11;
+            rotationMatrix.M12 = transformMatrix.M12;
+            rotationMatrix.M13 = transformMatrix.M13;
+
+            rotationMatrix.M21 = transformMatrix.M21;
+            rotationMatrix.M22 = transformMatrix.M22;
+            rotationMatrix.M23 = transformMatrix.M23;
+
+            rotationMatrix.M31 = transformMatrix.M31;
+            rotationMatrix.M32 = transformMatrix.M32;
+            rotationMatrix.M33 = transformMatrix.M33;
+            Matrix invertedRotation = Matrix.Transpose(rotationMatrix);
+
+            transformMatrix.M11 = invertedRotation.M11;
+            transformMatrix.M12 = invertedRotation.M12;
+            transformMatrix.M13 = invertedRotation.M13;
+
+            transformMatrix.M21 = invertedRotation.M21;
+            transformMatrix.M22 = invertedRotation.M22;
+            transformMatrix.M23 = invertedRotation.M23;
+
+            transformMatrix.M31 = invertedRotation.M31;
+            transformMatrix.M32 = invertedRotation.M32;
+            transformMatrix.M33 = invertedRotation.M33;
+            //---End of Reverse Rotation--- 
+
+            //--- Reverse y---
+            transformMatrix.M42 = -transformMatrix.M42; // Inverts the y input to -y
+                                                        //--- End of Reverse y ---
+
+            // ----- Scale Matrix ----- #3
+            float aspecRatio = (float)viewPort.X / (float)viewPort.Y;
+            float scaleFactor = 2.0f / (float)viewPort.Y;
+            float x = scaleFactor / aspecRatio;
+            float y = scaleFactor;
+
+            Matrix scale = new Matrix();
+            //Debug.WriteLine(scale.ToString());
+            scale.M11 = x;
+            scale.M22 = y;
+            scale.M33 = 1;
+            scale.M44 = 1;
+
+            // Offset to the Top Left Corner like in the normal Spritebatch
+            scale.M41 = -1;
+            scale.M42 = 1;
+            // ----- Scale Matrix -----
+
+            return transformMatrix * scale;
         }
 
         /// <summary>
@@ -235,9 +336,9 @@ namespace MonoGame.SpritesheetInstancing
         /// Returns the current Texture2D sprite(sheet)
         /// </summary>
         /// <returns></returns>
-        public Texture2D ReturnSpritesheet()            
-        { 
-            return spriteSheet; 
+        public Texture2D ReturnSpritesheet()
+        {
+            return spriteSheet;
         }
 
         /// <summary>
@@ -275,14 +376,47 @@ namespace MonoGame.SpritesheetInstancing
         }
 
         /// <summary>
-        /// Starts collecting the “drawcalls” in an array before sending them to the graphics card in a (Vetex)Instancing buffer.
-        /// <paramref  name="numberOfElements"/> sets the array capacity (standart = 1).
-        /// The array will automatically grow as needed.
+        /// Returns the Size of the internal Instancing Array.
+        /// </summary>
+        /// <returns></returns>
+        public int InternalArraySize()
+        {
+            return instanceDataArray.Length;
+        }
+
+        /// <summary>
+        /// Sets the Internal Array Size to a new to a specific amount.
+        /// If the Size is the same as the current size the Array will not resize.
+        /// </summary>
+        /// <param name="newSize"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public void SetInternalArraySizes(int newSize)
+        {
+            if (newSize <= 0)
+            {
+                throw new InvalidOperationException("Cannot set the internal Array under 1.");
+            }
+
+            if (beginCalled)
+            {
+                throw new InvalidOperationException("Cannot set the internal Array in a Drawcall.");
+            }
+
+            // Only set the Array to the new size if it really is a different one
+            if (instanceDataArray.Length != newSize)
+            {
+                Array.Resize(ref instanceDataArray, newSize);
+            }
+        }
+
+
+        /// <summary>
+        /// Starts collecting the “drawcalls” in an array before sending them to the graphics card in a (Vetex)Instancing buffer.        
+        /// The internal Instaning array will automatically grow as needed.
         /// </summary>
         /// <param name="blendState">AlphaBlend if empty</param>        
-        /// <param name="transforMatrix">0.0 is in the top left corner if empty</param>        
-        /// <param name="numberOfElements">Sizes the Array to the numberOfElements</param>
-        public void Begin(Matrix? transforMatrix = null, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null, int numberOfElements = 0)
+        /// <param name="transforMatrix">0.0 is in the top left corner if empty</param>
+        public void Begin(Matrix? transforMatrix = null, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null)
         {
             // Like Spritebatch
             if (beginCalled)
@@ -293,7 +427,7 @@ namespace MonoGame.SpritesheetInstancing
             beginCalled = true;
             // Return if there is no Texture
             if (!hasSpritesheet)
-            {                
+            {
                 return;
             }
 
@@ -303,35 +437,50 @@ namespace MonoGame.SpritesheetInstancing
             graphicsDevice.RasterizerState = rasterizerState ?? RasterizerState.CullNone;
             transformMatrix = transforMatrix ?? likeSpritebatchEmptyMatrix; // Like the Spritebatch
 
-            // Uses an Array if the number of elements are known
-            // If size of the Array is equal to the numbersOfElements the array keeps its size, no new allocation on the heap
-            if (numberOfElements > 0)
+            // Get the Right Matrix here and not in the Shader per Vertex
+            transformMatrix = CreateRightMatrix(transformMatrix);
+
+            // Reset the Instance Number / instanceDataArray will grow dynamic
+            instanceNumber = 0;
+        }
+
+        /// <summary>
+        /// Starts collecting draw calls in jagged arrays, which will be sent to the graphics card via a (Vertex) Instancing buffer, one after another.            
+        /// The jagged arrays will automatically resize as needed.
+        /// </summary>
+        /// <param name="transforMatrix">0.0 is in the top left corner if empty</param>     
+        public void BeginNoRenderStateSwap(Matrix? transforMatrix = null)
+        {
+            // Like Spritebatch
+            if (beginCalled)
             {
-                // Array size increase if number of Elements are bigger
-                if (instanceDataArray.Length < numberOfElements)
-                {
-                    instanceDataArray = new InstanceData[numberOfElements];
-                }
-                instanceNumber = 0;
+                throw new InvalidOperationException("Begin cannot be called again until End has been successfully called.");
             }
-            // Resize the Array (Capacity not known)            
-            else
+            // For the End Method
+            beginCalled = true;
+            // Return if there is no Texture
+            if (!hasSpritesheet)
             {
-                instanceDataArray = new InstanceData[1];
-                instanceNumber = 0;
-            }            
+                return;
+            }
+
+            transformMatrix = transforMatrix ?? likeSpritebatchEmptyMatrix; // Like the Spritebatch
+
+            // Get the Right Matrix here and not in the Shader per Vertex
+            transformMatrix = CreateRightMatrix(transformMatrix);
+
+            // Reset the Instance Number / instanceDataArray will grow dynamic
+            instanceNumber = 0;
         }
 
         /// <summary>
         /// Starts collecting the “drawcalls” in an array before sending them to the graphics card in a (Vetex)Instancing buffer.
-        /// <paramref  name="numberOfElements"/> sets the array capacity (standart = 1).
         /// The array will automatically grow/shrink as needed.
         /// Changes the Texture(Spritesheet) before the drawcall
         /// </summary>
         /// <param name="blendState">AlphaBlend if empty</param>        
         /// <param name="transforMatrix">0.0 is in the top left corner if empty</param>        
-        /// <param name="numberOfElements">Sizes the Array to the numberOfElements</param>
-        public void Begin(Texture2D spriteSheet, Matrix? transforMatrix = null, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null, int numberOfElements = 0)
+        public void Begin(Texture2D spriteSheet, Matrix? transforMatrix = null, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null)
         {
             // Like Spritebatch
             if (beginCalled)
@@ -356,24 +505,45 @@ namespace MonoGame.SpritesheetInstancing
             graphicsDevice.RasterizerState = rasterizerState ?? RasterizerState.CullNone;
             transformMatrix = transforMatrix ?? likeSpritebatchEmptyMatrix; // Like the Spritebatch
 
-            // Uses an Array if the number of elements are known
-            // If size of the Array is equal to the numbersOfElements the array keeps its size, no new allocation on the heap
-            if (numberOfElements > 0)
+            // Get the Right Matrix here and not in the Shader per Vertex
+            transformMatrix = CreateRightMatrix(transformMatrix);
+
+            // Reset the Instance Number / instanceDataArray will grow dynamic
+            instanceNumber = 0;
+        }
+
+        /// <summary>
+        /// Starts collecting draw calls in jagged arrays, which will be sent to the graphics card via a (Vertex) Instancing buffer, one after another.            
+        /// The jagged arrays will automatically resize as needed.
+        /// Changes the Texture(Spritesheet) before the drawcall
+        /// </summary>
+        /// <param name="transforMatrix">0.0 is in the top left corner if empty</param>         
+        public void BeginNoRenderStateSwap(Texture2D spriteSheet, Matrix? transforMatrix = null)
+        {
+            // Like Spritebatch
+            if (beginCalled)
             {
-                // Array size increase only if number of elements are bigger than the Array
-                if (instanceDataArray.Length < numberOfElements)
-                {
-                    //instanceDataArray = null;
-                    instanceDataArray = new InstanceData[numberOfElements];
-                }
-                instanceNumber = 0;
+                throw new InvalidOperationException("Begin cannot be called again until End has been successfully called.");
             }
-            // Resize the Array (Capacity not known)            
-            else
+
+            // Changes the Spritesheet
+            ChangeSpritesheet(spriteSheet);
+
+            // For the End Method
+            beginCalled = true;
+            // Return if there is no Texture
+            if (!hasSpritesheet)
             {
-                instanceDataArray = new InstanceData[1];
-                instanceNumber = 0;
+                return;
             }
+
+            transformMatrix = transforMatrix ?? likeSpritebatchEmptyMatrix; // Like the Spritebatch
+
+            // Get the Right Matrix here and not in the Shader per Vertex
+            transformMatrix = CreateRightMatrix(transformMatrix);
+
+            // Reset the Instance Number / instanceDataArray will grow dynamic
+            instanceNumber = 0;
         }
 
         /// <summary>
@@ -405,7 +575,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].RectangleWH = (spritesheetWidth << 16) | (spritesheetHeight & 65535);
             instanceDataArray[instanceNumber].Position = new Vector2(spritesheetWidth / 2f, spritesheetHeight / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
-            
+
             instanceNumber++;
         }
 
@@ -430,7 +600,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].RectangleWH = (spritesheetWidth << 16) | (spritesheetHeight & 65535);
             instanceDataArray[instanceNumber].Position = position + new Vector2(spritesheetWidth / 2f, spritesheetHeight / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
-            
+
             instanceNumber++;
         }
 
@@ -482,7 +652,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
             instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2f, rectangle.Height / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
-            
+
             instanceNumber++;
         }
 
@@ -509,7 +679,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataArray[instanceNumber].RectangleWH = (rectangle.Width << 16) | (rectangle.Height & 65535);
             instanceDataArray[instanceNumber].Position = position + new Vector2(rectangle.Width / 2f, rectangle.Height / 2f);
             instanceDataArray[instanceNumber].Scale = Vector2.One;
-            
+
             instanceNumber++;
         }
 
@@ -569,7 +739,7 @@ namespace MonoGame.SpritesheetInstancing
         }
 
         // Normal Draw
-        
+
         /// <summary>
         /// Adds the complete sprite or spritesheet element to the draw array for rendering.
         /// <para>
@@ -629,7 +799,7 @@ namespace MonoGame.SpritesheetInstancing
         /// <param name="position">The position of the sprite.</param>
         /// <param name="rectangle">The source rectangle from the spritesheet.</param>
         public void Draw(Vector2 position, Rectangle rectangle)
-        {   
+        {
             if (instanceNumber >= instanceDataArray.Length)
             {
                 ResizeTheInstancesArray();
@@ -754,7 +924,7 @@ namespace MonoGame.SpritesheetInstancing
             if (instanceNumber < 1)
             {
                 return;
-            }            
+            }
             // Without the Array there is no Draw call
             if (instanceDataArray == null)
             {
@@ -770,7 +940,7 @@ namespace MonoGame.SpritesheetInstancing
             }
 
             // Fills the (vertex)instancingbuffer
-            dynamicinstancingBuffer.SetData(instanceDataArray, 0, instanceNumber, SetDataOptions.Discard);                
+            dynamicinstancingBuffer.SetData(instanceDataArray, 0, instanceNumber, SetDataOptions.Discard);
 
             // Binds the vertexBuffers
             graphicsDevice.SetVertexBuffers(new VertexBufferBinding[]
@@ -781,20 +951,18 @@ namespace MonoGame.SpritesheetInstancing
 
             // Indexbuffer
             graphicsDevice.Indices = indexBuffer;
-            
+
 
             // Paramethers to the shader
-            // Viewport
             // TextureSize
             // Viewmatrix
             // SpriteSheet Texture2D            
-            spritesheetInstancingShader.Parameters["DisplaySize"].SetValue(new Vector2(viewPort.X, viewPort.Y));
             spritesheetInstancingShader.Parameters["TextureSize"].SetValue(new Vector2(spritesheetWidth, spritesheetHeight));
             spritesheetInstancingShader.Parameters["View_projection"].SetValue(transformMatrix);
             spritesheetInstancingShader.Parameters["TextureSampler"].SetValue(spriteSheet);
 
             // Activates the shader
-            spritesheetInstancingShader.CurrentTechnique.Passes[0].Apply();                       
+            spritesheetInstancingShader.CurrentTechnique.Passes[0].Apply();
 
             // Draws the 2 triangles on the screen
             graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 2, instanceNumber);
@@ -813,7 +981,7 @@ namespace MonoGame.SpritesheetInstancing
 
         // Array       
         private InstanceData[][] instanceDataJaggedArray;   // Jagged Array for the Performance (List was slower by like 30%)
-        private int[] instanceNumbers;
+        private int[] instanceNumbers;                      // Numbers of elements per Spritesheet
 
         // Spritesheets
         private Texture2D[] spriteSheets;
@@ -900,6 +1068,108 @@ namespace MonoGame.SpritesheetInstancing
         }
 
         /// <summary>
+        /// Creates the right Matrix here instead of in the Shader for each vertex.
+        /// </summary>
+        /// <param name="transformMatrix"></param>
+        /// <returns></returns>
+        private Matrix CreateRightMatrix(Matrix transformMatrix)
+        {
+            //---About Matrix in Monogame---
+            // 
+            // Rotation Matrix 2x2, 4x4
+            // [ cos(ß)  -sin(ß) ]
+            // [ sin(ß)   cos(ß) ]
+            // 
+            // [ cos(ß)  -sin(ß)  0  0 ]
+            // [ sin(ß)   cos(ß)  0  0 ]
+            // [   0        0     1  0 ]
+            // [   0        0     0  1 ]
+            // 
+            // Scale Matrix 4x4 #3
+            //
+            // [ sX  0  0  0 ]
+            // [  0 sY  0  0 ]
+            // [  0  0 sZ  0 ]
+            // [  0  0  0  1 ]
+            //
+            // Translation Matrix normal  #1
+            // 
+            // [ 1  0  0  tx ] // Not used here
+            // [ 0  1  0  ty ]
+            // [ 0  0  1  tz ]
+            // [ 0  0  0  1  ]
+            //
+            // Translation Matrix used here #2
+            // 
+            // [ 1   0   0   0 ]
+            // [ 0   1   0   0 ]
+            // [ 0   0   1   0 ]
+            // [ tx  ty  tz  1 ]
+            //
+            // Identiity Matrix (#3) 
+            // 
+            // [ 1  0  0  0 ]
+            // [ 0  1  0  0 ]
+            // [ 0  0  1  0 ]
+            // [ 0  0  0  1 ]
+            //
+            //---End About Matrix in Monogame---
+
+            // ----- Reverse Rotation -----
+            Matrix rotationMatrix = new Matrix();
+            rotationMatrix.M11 = transformMatrix.M11;
+            rotationMatrix.M12 = transformMatrix.M12;
+            rotationMatrix.M13 = transformMatrix.M13;
+
+            rotationMatrix.M21 = transformMatrix.M21;
+            rotationMatrix.M22 = transformMatrix.M22;
+            rotationMatrix.M23 = transformMatrix.M23;
+
+            rotationMatrix.M31 = transformMatrix.M31;
+            rotationMatrix.M32 = transformMatrix.M32;
+            rotationMatrix.M33 = transformMatrix.M33;
+            Matrix invertedRotation = Matrix.Transpose(rotationMatrix);
+
+            transformMatrix.M11 = invertedRotation.M11;
+            transformMatrix.M12 = invertedRotation.M12;
+            transformMatrix.M13 = invertedRotation.M13;
+
+            transformMatrix.M21 = invertedRotation.M21;
+            transformMatrix.M22 = invertedRotation.M22;
+            transformMatrix.M23 = invertedRotation.M23;
+
+            transformMatrix.M31 = invertedRotation.M31;
+            transformMatrix.M32 = invertedRotation.M32;
+            transformMatrix.M33 = invertedRotation.M33;
+            //---End of Reverse Rotation--- 
+
+            //--- Reverse y---
+            transformMatrix.M42 = -transformMatrix.M42; // Inverts the y input to -y
+                                                        //--- End of Reverse y ---
+
+            // ----- Scale Matrix ----- #3
+            float aspecRatio = (float)viewPort.X / (float)viewPort.Y;
+            float scaleFactor = 2.0f / (float)viewPort.Y;
+            float x = scaleFactor / aspecRatio;
+            float y = scaleFactor;
+
+            Matrix scale = new Matrix();
+            //Debug.WriteLine(scale.ToString());
+            scale.M11 = x;
+            scale.M22 = y;
+            scale.M33 = 1;
+            scale.M44 = 1;
+
+            // Offset to the Top Left Corner like in the normal Spritebatch
+            scale.M41 = -1;
+            scale.M42 = 1;
+            // ----- Scale Matrix -----
+
+            return transformMatrix * scale;
+        }
+
+
+        /// <summary>
         /// Loads a new Shader
         /// </summary>
         /// <param name="spritesheetInstancingShader"></param>
@@ -948,7 +1218,7 @@ namespace MonoGame.SpritesheetInstancing
                 for (int i = 0; i < spriteSheets.Length; i++)
                 {
                     // Elemente des Jagged Arrays erstellen
-                    instanceDataJaggedArray[i] = new InstanceData[1]; 
+                    instanceDataJaggedArray[i] = new InstanceData[1];
                 }
 
                 hasSpritesheets = true;
@@ -957,6 +1227,120 @@ namespace MonoGame.SpritesheetInstancing
             {
                 hasSpritesheets = false;
             }
+        }
+
+        /// <summary>
+        /// Adds a single Sprite to the Spritesheets. 
+        /// This cant be performed during a draw call.
+        /// </summary>
+        /// <param name="spriteSheet"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public void AddSpriteSheet(Texture2D spriteSheet)
+        {
+            if (beginCalled)
+            {
+                throw new InvalidOperationException("Spritesheet add mid draw is not possible.");
+            }
+
+            if (spriteSheets != null)
+            {
+                Texture2D[] newSpriteSheets = new Texture2D[spriteSheets.Length + 1];
+                Array.Copy(spriteSheets, newSpriteSheets, spriteSheets.Length);
+                newSpriteSheets[spriteSheets.Length] = spriteSheet;
+                ChangeSpritesheets(newSpriteSheets);
+            }
+            // Wenn keine Spritesheets existieren wird ein neuer array erstellt und nicht hinzugefügt
+            else
+            {
+                Texture2D[] newSpriteSheets = new Texture2D[1];
+                newSpriteSheets[0] = spriteSheet;
+                ChangeSpritesheets(newSpriteSheets);
+            }
+        }
+
+        /// <summary>
+        /// Removes the sprite from the internal Array.
+        /// </summary>
+        /// <param name="spriteSheet"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public void RemoveSpritesheet(Texture2D spriteSheet)
+        {
+            if (beginCalled)
+            {
+                throw new InvalidOperationException("Spritesheet add mid draw is not possible.");
+            }
+
+            bool foundSpriteSheet = false;
+            for (int i = 0; i < spriteSheets.Length; i++)
+            {
+                if (spriteSheet == spriteSheets[i])
+                {
+                    spriteSheets[i] = null;
+                    foundSpriteSheet = true;
+                    break;
+                }
+            }
+
+            // Existiert es nicht wird verlassen
+            if (!foundSpriteSheet)
+            {
+                return;
+            }
+
+            // Wenn es das Letzte war wird alles gecleart.
+            if (spriteSheets.Length == 1)
+            {
+                Clear();
+                return;
+            }
+
+            Texture2D[] newSpriteSheets = new Texture2D[spriteSheets.Length - 1];
+
+            int addCount = 0;
+            for (int i = 0; i < spriteSheets.Length; i++)
+            {
+                if (spriteSheets[i] != null)
+                {
+                    newSpriteSheets[addCount] = spriteSheets[i];
+                    addCount++;
+                }
+            }
+
+            ChangeSpritesheets(newSpriteSheets);
+        }
+
+        /// <summary>
+        /// Removes all internal Arrays and Clears all Spritesheets.
+        /// </summary>
+        public void Clear()
+        {
+            hasSpritesheets = false;
+            spriteSheets = null;
+            instanceNumbers = null;
+            spritesheetWidthAndHeight = null;
+            instanceDataJaggedArray = null;
+        }
+
+        /// <summary>
+        /// Gives back if a sprite is already in the spritesheets.
+        /// </summary>
+        /// <param name="spriteSheet"></param>
+        /// <returns></returns>
+        public bool HasSpriteSheet(Texture2D spriteSheet)
+        {
+            if (spriteSheets == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < spriteSheets.Length; i++)
+            {
+                if (spriteSheet == spriteSheets[i])
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -1009,23 +1393,94 @@ namespace MonoGame.SpritesheetInstancing
         /// </summary>
         private void ResizeTheInstancesArray(int jaggedArrayNumber)
         {
+            //Debug.WriteLine("Array resize");
             Array.Resize(ref instanceDataJaggedArray[jaggedArrayNumber], instanceDataJaggedArray[jaggedArrayNumber].Length * 2);
         }
 
         /// <summary>
-        /// Starts collecting draw calls in jagged arrays, which will be sent to the graphics card via a (Vertex) Instancing buffer, one after another.
-        /// The <paramref name="numberOfElementsArray"/> parameter defines the initial capacity for each texture in the internal <c>spriteSheets</c> array (default = 1).
-        /// The jagged arrays will automatically resize as needed.
-        /// <para>
-        /// <b>Important:</b> <paramref name="numberOfElementsArray"/> is defining the expected number of elements per texture in the internal <c>spriteSheets</c> array. 
-        /// This should be set manually to prevent constant resizing of the internal jagged arrays (can be set higher than needed).
-        /// </para>
+        /// Returns the Sizes of the internal Arrays.
+        /// </summary>
+        /// <returns></returns>
+        public int[] InternalArraySizes()
+        {
+            int[] instanceDataJaggedArraySizes = new int[instanceDataJaggedArray.Length];
+
+            for (int i = 0; i < instanceDataJaggedArraySizes.Length; i++)
+            {
+                instanceDataJaggedArraySizes[i] = instanceDataJaggedArray[i].Length;
+            }
+
+            return instanceDataJaggedArraySizes;
+        }
+
+        /// <summary>
+        /// Sets all the Internal Array Sizes new to a specific amount.
+        /// If the Size is the same as the currentsize the Array will not resize.
+        /// </summary>
+        /// <param name="newSize"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public void SetInternalArraySizes(int newSize)
+        {
+            if (newSize <= 0)
+            {
+                throw new InvalidOperationException("Cannot set the internal Array under 1.");
+            }
+
+            if (beginCalled)
+            {
+                throw new InvalidOperationException("Cannot set the internal Array in a Drawcall.");
+            }
+
+            // Only set the Array to the new size if it really is a different one
+            for (int i = 0; i < instanceDataJaggedArray.Length; i++)
+            {
+                if (instanceDataJaggedArray[i].Length != newSize)
+                {
+                    Array.Resize(ref instanceDataJaggedArray[i], newSize);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the specific Internal Array to new Size.
+        /// If the Size is the same as the currentsize the Array will not resize.
+        /// </summary>
+        /// <param name="arrayIndex"></param>
+        /// <param name="newSize"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public void SetSpecificInternalArraySizes(int arrayIndex, int newSize)
+        {
+            if (newSize <= 0)
+            {
+                throw new InvalidOperationException("Cannot set the internal Array under 1.");
+            }
+
+            if (beginCalled)
+            {
+                throw new InvalidOperationException("Cannot set the internal Array in a Drawcall.");
+            }
+
+            if (arrayIndex >= instanceDataJaggedArray.Length)
+            {
+                throw new InvalidOperationException("arrayIndex is outside of the Array");
+            }
+
+            // Only set the Array to the new size if it really is a different one
+            if (instanceDataJaggedArray[arrayIndex].Length != newSize)
+            {
+                Array.Resize(ref instanceDataJaggedArray[arrayIndex], newSize);
+            }
+        }
+
+
+
+        /// <summary>
+        /// Starts collecting draw calls in jagged arrays, which will be sent to the graphics card via a (Vertex) Instancing buffer, one after another.            
+        /// The jagged arrays will automatically resize as needed.            
         /// </summary>
         /// <param name="blendState">AlphaBlend if empty</param>        
         /// <param name="transforMatrix">0.0 is in the top left corner if empty</param>        
-        /// <param name="numberOfElementsArray">An array defining the expected number of elements per texture in the internal <c>spriteSheets</c> array. 
-        /// This should be set manually to prevent constant resizing of the internal jagged arrays (can be set higher than needed).</param>
-        public void Begin(Matrix? transforMatrix = null, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null, int[] numberOfElementsArray = null)
+        public void Begin(Matrix? transforMatrix = null, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null)
         {
             // Like Spritebatch
             if (beginCalled)
@@ -1046,47 +1501,85 @@ namespace MonoGame.SpritesheetInstancing
             graphicsDevice.RasterizerState = rasterizerState ?? RasterizerState.CullNone;
             transformMatrix = transforMatrix ?? likeSpritebatchEmptyMatrix; // Like the Spritebatch
 
-            // If the numberOfElements is not given or wrong
-            if (numberOfElementsArray == null || numberOfElementsArray.Length != spriteSheets.Length)
+            // Get the Right Matrix here and not in the Shader per Vertex
+            transformMatrix = CreateRightMatrix(transformMatrix);
+
+            // Check if the Spritesheets are not the same as the internal Array
+            if (spriteSheets.Length != instanceNumbers.Length || instanceNumbers == null)
             {
-                // Create new Arrays
-                numberOfElementsArray = new int[spriteSheets.Length];
                 instanceNumbers = new int[spriteSheets.Length];
             }
-
-            // Scale the instanceNumbers right
-            if (instanceNumbers.Length != numberOfElementsArray.Length)
+            else
             {
-                instanceNumbers = new int[numberOfElementsArray.Length];
-            }
-
-            // For each SpriteSheet in spriteSheets
-            for (int i = 0; i < spriteSheets.Length; i++)
-            {
-                // No spriteSheet continue
-                if (spriteSheets[i] == null)
+                // Reset the instance Numbers
+                for (int i = 0; i < instanceNumbers.Length; i++)
                 {
-                    continue;
-                }
-
-                // Uses an Jagged Array if the number of elements are known
-                // If size of the Jagged Array is equal to the numbersOfElements the array keeps its size, no new allocation on the heap
-                if (numberOfElementsArray[i] > 0)
-                {
-                    // If jagged Array is smaller than the numberOfElements, new numberOfElements
-                    if (instanceDataJaggedArray[i].Length < numberOfElementsArray[i])
-                    {
-                        instanceDataJaggedArray[i] = new InstanceData[numberOfElementsArray[i]];
-                    }
-                    instanceNumbers[i] = 0;
-                }
-                // Resize the Jagged Array (Capacity not known) 
-                else
-                {
-                    instanceDataJaggedArray[i] = new InstanceData[1];
                     instanceNumbers[i] = 0;
                 }
             }
+
+            //Debug.WriteLine("---------------------------------------");
+            //Debug.WriteLine("Spritesheets: " + spriteSheets.Length);
+            //
+            //for (int i = 0; i < instanceDataJaggedArray.Length; i++)
+            //{
+            //    int instanceDataLength = instanceDataJaggedArray[i].Length;
+            //    Debug.WriteLine("InstanceData: " + i);
+            //    Debug.WriteLine("InstanceDataLength: " + instanceDataLength);
+            //}
+            //Debug.WriteLine("---------------------------------------");
+        }
+
+
+        /// <summary>
+        /// Starts collecting draw calls in jagged arrays, which will be sent to the graphics card via a (Vertex) Instancing buffer, one after another.            
+        /// The jagged arrays will automatically resize as needed.
+        /// </summary>
+        /// <param name="transforMatrix">0.0 is in the top left corner if empty</param>       
+        public void BeginNoRenderStateSwap(Matrix? transforMatrix = null)
+        {
+            // Like Spritebatch
+            if (beginCalled)
+            {
+                throw new InvalidOperationException("Begin cannot be called again until End has been successfully called.");
+            }
+            // For the End Method
+            beginCalled = true;
+            // Return if there are no Textures
+            if (!hasSpritesheets)
+            {
+                return;
+            }
+
+            transformMatrix = transforMatrix ?? likeSpritebatchEmptyMatrix; // Like the Spritebatch
+
+            // Get the Right Matrix here and not in the Shader per Vertex
+            transformMatrix = CreateRightMatrix(transformMatrix);
+
+            // Check if the Spritesheets are not the same as the internal Array
+            if (spriteSheets.Length != instanceNumbers.Length || instanceNumbers == null)
+            {
+                instanceNumbers = new int[spriteSheets.Length];
+            }
+            else
+            {
+                // Reset the instance Numbers
+                for (int i = 0; i < instanceNumbers.Length; i++)
+                {
+                    instanceNumbers[i] = 0;
+                }
+            }
+
+            //Debug.WriteLine("---------------------------------------");
+            //Debug.WriteLine("Spritesheets: " + spriteSheets.Length);
+            //
+            //for (int i = 0; i < instanceDataJaggedArray.Length; i++)
+            //{
+            //    int instanceDataLength = instanceDataJaggedArray[i].Length;
+            //    Debug.WriteLine("InstanceData: " + i);
+            //    Debug.WriteLine("InstanceDataLength: " + instanceDataLength);
+            //}
+            //Debug.WriteLine("---------------------------------------");
         }
 
         // Draw Top Left Unsave
@@ -1276,7 +1769,7 @@ namespace MonoGame.SpritesheetInstancing
         /// <param name="rectangle">The source rectangle from the spritesheet.</param>
         /// <param name="scale">The scale of the sprite. (x, y)</param>
         public void DrawTopLeftUnsave(int textureIndex, Vector2 position, Rectangle rectangle, Vector2 scale)
-        {            
+        {
             // Double the jagged array size
             if (instanceNumbers[textureIndex] >= instanceDataJaggedArray[textureIndex].Length)
             {
@@ -1329,7 +1822,7 @@ namespace MonoGame.SpritesheetInstancing
 
             instanceNumbers[textureIndex]++;
         }
-        
+
         // Draw Top Left
 
         /// <summary>
@@ -1625,7 +2118,7 @@ namespace MonoGame.SpritesheetInstancing
             instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = scale;
 
             instanceNumbers[textureIndex]++;
-        }        
+        }
 
         // Unsave Draw
 
@@ -1927,6 +2420,47 @@ namespace MonoGame.SpritesheetInstancing
         /// </summary>  
         /// <param name="texture">The texture to render, which must match one of the elements in the internal <c>spriteSheets</c> array.</param>
         /// <param name="position">The position of the sprite.</param>
+        public void Draw(Texture2D texture, Vector2 position, Color color)
+        {
+            // return if there is no spritesheet
+            int textureIndex = -1;
+            for (int i = 0; i < spriteSheets.Length; i++)
+            {
+                if (texture == spriteSheets[i])
+                {
+                    textureIndex = i;
+                }
+            }
+            if (textureIndex == -1)
+            {
+                return;
+            }
+
+            // Double the jagged array size
+            if (instanceNumbers[textureIndex] >= instanceDataJaggedArray[textureIndex].Length)
+            {
+                ResizeTheInstancesArray(textureIndex);
+            }
+
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Depth = instanceNumbers[textureIndex];
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Rotation = 0f;
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Color = color;
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleXY = 0;
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].RectangleWH = (spritesheetWidthAndHeight[textureIndex].X << 16) | (spritesheetWidthAndHeight[textureIndex].Y & 65535);
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Position = position;
+            instanceDataJaggedArray[textureIndex][instanceNumbers[textureIndex]].Scale = Vector2.One;
+
+            instanceNumbers[textureIndex]++;
+        }
+
+        /// <summary>
+        /// Adds a sprite or spritesheet element to the draw list for rendering, ensuring the input texture matches an element in the internal <c>spriteSheets</c> array.
+        /// <para>
+        /// The sprite is centered at its middle point and transformed based on the provided parameters.
+        /// </para>
+        /// </summary>  
+        /// <param name="texture">The texture to render, which must match one of the elements in the internal <c>spriteSheets</c> array.</param>
+        /// <param name="position">The position of the sprite.</param>
         /// <param name="rectangle">The source rectangle from the spritesheet.</param>
         public void Draw(Texture2D texture, Vector2 position, Rectangle rectangle)
         {
@@ -2152,11 +2686,9 @@ namespace MonoGame.SpritesheetInstancing
 
 
                 // Paramethers to the shader
-                // Viewport
                 // TextureSize
                 // Viewmatrix
-                // SpriteSheet Texture2D            
-                spritesheetInstancingShader.Parameters["DisplaySize"].SetValue(new Vector2(viewPort.X, viewPort.Y));
+                // SpriteSheet Texture2D
                 spritesheetInstancingShader.Parameters["TextureSize"].SetValue(new Vector2(spritesheetWidthAndHeight[i].X, spritesheetWidthAndHeight[i].Y));
                 spritesheetInstancingShader.Parameters["View_projection"].SetValue(transformMatrix);
                 spritesheetInstancingShader.Parameters["TextureSampler"].SetValue(spriteSheets[i]);
@@ -2169,4 +2701,3 @@ namespace MonoGame.SpritesheetInstancing
             }
         }
     }
-}
