@@ -8,7 +8,7 @@
 
 ---
 ## Pros
-- Enables efficient mass instancing of rectangles from a single sprite sheet.
+- Enables efficient mass instancing of rectangles from a single spritesheet.
 - Achieves up to 80x better CPU efficiency compared to SpriteBatch using the same sprite sheet.
 
 ## Cons
@@ -178,6 +178,19 @@ Using a single 4K sprite sheet and random positions:
 **- SetSpecificInternalArraySizes()**
    - Sets the internal instancing array at the given index to a specific size.
    - Cannot be called between Begin() and End().
+
+**- GetDrawCount()**
+   - Returns the number of Drawcalls that has been send to the Gpu from the End() Method.
+   - Can be used after End()
+
+**- HasDrawCalls()**
+   - Returns true/false if there are planed Draws from the Draw() methods.
+   - Can be used between Begin() and End(). Begin() does reset the internal count again.
+
+**- CancelDrawEnd()**
+   - Alternative to End(). Cancels all Drawcalls.
+   - Can be used to skip the Drawcalls in End() or to breakout if there are no Drawcalls.
+   - Usefull in combination with Rendertargets and the controll flow.
 
 ---
 ## How to Use the Class
