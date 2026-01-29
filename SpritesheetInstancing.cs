@@ -44,6 +44,7 @@ namespace MonoGame.SpritesheetInstancing
     /// This class allows Instancing of rectangles out of a spritsheet or the complete texure.
     /// It draws always from back to front.
     /// Requires DX11 (DX10) and GraphicsProfile.HiDef
+    /// bufferCount can be set to the amount of needed instancing buffers. Each End() rotated them one by one.
     /// </summary>
     public class SpritesheetInstancing
     {
@@ -1025,6 +1026,13 @@ namespace MonoGame.SpritesheetInstancing
         }
     }
 
+    /// <summary>
+    /// This class allows Instancing of rectangles out of multiple spritsheets or texures.
+    /// It draws always from back to front.
+    /// Drawcalls are also orderd by the internal texture array. (First all draws from the first spritesheet, then the secound...)
+    /// Requires DX11 (DX10) and GraphicsProfile.HiDef
+    /// bufferCount can be set to the amount of needed instancing buffers. Each End() rotated them one by one.
+    /// </summary>
     public class SpritesheetInstancingAdv
     {
         private readonly int BUFFER_COUNT;
@@ -2814,3 +2822,4 @@ namespace MonoGame.SpritesheetInstancing
             }
         }
     }
+
