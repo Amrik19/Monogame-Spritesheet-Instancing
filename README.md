@@ -105,6 +105,19 @@ Using a single 4K sprite sheet and random positions:
   - By default, the array starts at size 1 and grows dynamically as needed.
   - Can not be called during a draw call (Begin() and End()).
 
+**- GetDrawCount()**
+   - Returns the number of Drawcalls that has been send to the Gpu from the End() Method.
+   - Can be used after End()
+
+**- HasDrawCalls()**
+   - Returns true/false if there are planed Draws from the Draw() methods.
+   - Can be used between Begin() and End(). Begin() does reset the internal count again.
+
+**- CancelDrawEnd()**
+   - Alternative to End(). Cancels all Drawcalls.
+   - Can be used to skip the Drawcalls in End() or to breakout if there are no Drawcalls.
+   - Usefull in combination with Rendertargets and the controll flow.
+
 ---
 ## The SpriteSheet Instancing Advanced class uses following Methods
 **- UpdateViewPort()**
