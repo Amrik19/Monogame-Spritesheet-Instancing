@@ -13,7 +13,6 @@
 
 ## Cons
 - Requires DirectX 11 (or DX10).
-- Supports only one sprite sheet (texture) per draw call. (Only the SpritesheetInstancing class)
 - Draw calls must be manually ordered for proper rendering (back-to-front).
 - Custom shaders must be built on top of the SpriteSheet Instancing Shader.
 ---
@@ -54,69 +53,84 @@ Using a single 4K sprite sheet and random positions:
   - Updates the viewport settings.
   - Essential for maintaining accurate scaling and functionality when the game window size changes.
   - Must be called after a resolution change, prior to Begin().
+    
 
 **- Begin()**
    - Similar to MonoGame's SpriteBatch, this method collects instances into an array.  
    - These instances are later sent to the graphics card using a (Vertex) Instancing Buffer for efficient rendering.
    - Includes an overload for changing the texture.
    - Begin(Texture2D, Matrix, Blendstate, Samplestate, DepthStencilState, Rasterstate)
+     
 
 **- Draw()**
    - Positions the sprite(rectangle) at its center by default.
    - Offers various overloads.   
    - Draw(Vector2 position, Rectangle, rotation, Vector2 scale, Color)
+     
 
 **- DrawTopLeft()**
    - Positions the sprite(rectangle) with the top-left corner as the origin.
    - Offers various overloads.
    - DrawTopLeft(Vector2 position, Rectangle, Vector2 scale, Color)
+     
  
 **- End()**
    - Sends the collected instances to the graphics card using a (Vertex) Instancing Buffer.
     
 **- ReturnSpritesheet()**
    - Returns the current Texture2D associated with the class.
+     
  
 **- ChangeSpritesheet()**
    - Changes the Texture2D associated with the class.
    - Cannot be called between Begin() and End().
+     
 
 **- ChangeSpritesheetUnsave()**
    - Changes the Texture2D associated with the class.
    - Can be called between Begin() and End().
+     
   
 **- Dispose()**
    - Releases the Vertex and Index Buffers.
    - Should be called when the SpriteSheet instance is no longer needed.
+     
 
 **- LoadShaderAndTexture()**
    - Loads the shader and the Texture2D.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
+     
  
 **- LoadShader()**
    - Loads the shader.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
+     
 
 **- InternalArraySize()**
   - Returns the current size of the internal instancing array.
+    
 
 **- SetInternalArraySizes()**
   - Sets the internal instancing array to a fixed size.
   - By default, the array starts at size 1 and grows dynamically as needed.
   - Can not be called during a draw call (Begin() and End()).
+    
 
 **- GetDrawCount()**
    - Returns the number of Drawcalls that has been send to the Gpu from the End() Method.
    - Can be used after End()
+     
 
 **- HasDrawCalls()**
    - Returns true/false if there are planed Draws from the Draw() methods.
    - Can be used between Begin() and End(). Begin() does reset the internal count again.
+     
 
 **- CancelDrawEnd()**
    - Alternative to End(). Cancels all Drawcalls.
    - Can be used to skip the Drawcalls in End() or to breakout if there are no Drawcalls.
    - Usefull in combination with Rendertargets and the controll flow.
+     
 
 ---
 ## The SpriteSheet Instancing Advanced class uses following Methods
@@ -124,86 +138,106 @@ Using a single 4K sprite sheet and random positions:
   - Updates the viewport settings.
   - Essential for maintaining accurate scaling and functionality when the game window size changes.
   - Must be called after a resolution change, prior to Begin().
+    
 
 **- Begin()**
    - Similar to MonoGame's SpriteBatch, this method collects instances into seperate arrays for each spritesheet/texture in the internal texture array.  
    - These instances are later sent to the graphics card using a (Vertex) Instancing Buffer for efficient rendering.
    - Begin(Matrix, Blendstate, Samplestate, DepthStencilState, Rasterstate)
+     
 
 **- Draw()**
    - Positions the sprite(rectangle) at its center by default.
    - Offers various overloads.   
    - Draw(Texture2D texture, Vector2 position, Rectangle, rotation, Vector2 scale, Color)
+     
 
 **- DrawUnsave()**
    - Positions the sprite(rectangle) at its center by default.
    - Offers various overloads.   
    - Draw(int textureIndex, Vector2 position, Rectangle, rotation, Vector2 scale, Color)
+     
 
 **- DrawTopLeft()**
    - Positions the sprite(rectangle) with the top-left corner as the origin.
    - Offers various overloads.
    - DrawTopLeft(Texture2D texture, Vector2 position, Rectangle, Vector2 scale, Color)
+     
 
 **- DrawTopLeftUnsave()**
    - Positions the sprite(rectangle) with the top-left corner as the origin.
    - Offers various overloads.
    - DrawTopLeft(int textureIndex, Vector2 position, Rectangle, Vector2 scale, Color)
+     
 
 **- End()**
    - Sends the collected instances to the graphics card using a (Vertex) Instancing Buffer.
    - A separate draw call is made for each texture in the internal Texture2D array.
+     
 
 **- ReturnSpritesheets()**
    - Returns the current Texture2D array associated with the class.
+     
 
 **- ChangeSpritesheet()**
    - Changes the Texture2D array associated with the class.
    - Cannot be called between Begin() and End().
+     
 
 **- AddSpriteSheet()**
    - Adds a texture/spritesheet to the internal array.
    - Cannot be called between Begin() and End().
+     
 
 **- RemoveSpritesheet()**
    - Removes the texture/spritesheet from the internal array, if present.
    - Cannot be called between Begin() and End().
+     
 
 **- HasSpriteSheet()**
    - Checks whether the given texture/spritesheet exists in the internal array.
+     
 
 **- Dispose()**
    - Releases the Vertex and Index Buffers.
    - Should be called when the SpriteSheet instance is no longer needed.
+     
 
 **- LoadShader()**
    - Loads the shader.
    - Custom shaders should build on top of the SpriteSheet Instancing Shader.
+     
 
 **- InternalArraySizes()**
    - Returns an int[] array representing the sizes of the internal jagged instancing arrays.
    - Each element corresponds to the size of a specific internal instancing array.
+     
 
 **- SetInternalArraySizes()**
    - Sets all internal instancing arrays to the specified size.
    - Cannot be called between Begin() and End().
+     
 
 **- SetSpecificInternalArraySizes()**
    - Sets the internal instancing array at the given index to a specific size.
    - Cannot be called between Begin() and End().
+     
 
 **- GetDrawCount()**
    - Returns the number of Drawcalls that has been send to the Gpu from the End() Method.
    - Can be used after End()
+     
 
 **- HasDrawCalls()**
    - Returns true/false if there are planed Draws from the Draw() methods.
    - Can be used between Begin() and End(). Begin() does reset the internal count again.
+     
 
 **- CancelDrawEnd()**
    - Alternative to End(). Cancels all Drawcalls.
    - Can be used to skip the Drawcalls in End() or to breakout if there are no Drawcalls.
    - Usefull in combination with Rendertargets and the controll flow.
+     
 
 ---
 ## How to Use the Class
