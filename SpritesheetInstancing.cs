@@ -47,13 +47,17 @@ namespace MonoGame.SpritesheetInstancing
     /// </summary>
     public class SpritesheetInstancing
     {
+        private readonly int BUFFER_COUNT;
+        private int currentBuffer = 0;
+        private int drawCount = 0;
+
         // Viewport, Buffer, Shader        
         private GraphicsDevice graphicsDevice;
         private Point viewPort;
         private Effect spritesheetInstancingShader;
         private VertexBuffer vertexBuffer;
         private IndexBuffer indexBuffer;
-        private DynamicVertexBuffer dynamicinstancingBuffer;
+        private DynamicVertexBuffer[] instancingBuffers;
 
         // Array       
         private InstanceData[] instanceDataArray;   // Array for the Performance (List was slower by like 30%)
@@ -84,8 +88,10 @@ namespace MonoGame.SpritesheetInstancing
         /// <param name="spritesheetInstancingShader"></param>
         /// <param name="spriteSheet"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SpritesheetInstancing(GraphicsDevice graphicsDevice, Point viewPortSizeXY, Effect spritesheetInstancingShader, Texture2D spriteSheet = null)
+        public SpritesheetInstancing(GraphicsDevice graphicsDevice, Point viewPortSizeXY, Effect spritesheetInstancingShader, int bufferCount = 1, Texture2D spriteSheet = null)
         {
+            BUFFER_COUNT = Math.Max(1, bufferCount);
+
             // Like Spritebatch
             if (graphicsDevice == null)
             {
@@ -135,7 +141,11 @@ namespace MonoGame.SpritesheetInstancing
             indexBuffer.SetData(indices);
 
             // Dynamicinstancing Buffer
-            dynamicinstancingBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), 1, BufferUsage.WriteOnly);
+            instancingBuffers = new DynamicVertexBuffer[BUFFER_COUNT];
+            for (int i = 0; i < BUFFER_COUNT; i++)
+            {
+                instancingBuffers[i] = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), 1, BufferUsage.WriteOnly);
+            }
         }
 
         /// <summary>
@@ -285,7 +295,7 @@ namespace MonoGame.SpritesheetInstancing
             {
                 hasSpritesheet = false;
             }
-        }
+        }        
 
         /// <summary>
         /// Changes the Spritesheet with a new one
@@ -298,7 +308,7 @@ namespace MonoGame.SpritesheetInstancing
             {
                 throw new InvalidOperationException("Spritesheet swap mid draw is not recomended. Use ChangeSpritesheetUnsave()");
             }
-
+            
             this.spriteSheet = spriteSheet;
             if (spriteSheet != null)
             {
@@ -367,11 +377,14 @@ namespace MonoGame.SpritesheetInstancing
         {
             vertexBuffer?.Dispose();
             indexBuffer?.Dispose();
-            dynamicinstancingBuffer?.Dispose();
+            for (int i = 0; i < BUFFER_COUNT; i++)
+            {
+                instancingBuffers[i]?.Dispose();
+            }
 
             vertexBuffer = null;
             indexBuffer = null;
-            dynamicinstancingBuffer = null;
+            instancingBuffers = null;
             instanceDataArray = null;
         }
 
@@ -409,6 +422,38 @@ namespace MonoGame.SpritesheetInstancing
             }
         }
 
+        /// <summary>
+        /// Returns true/false if there is a single Drawcall or more.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasDrawCalls()
+        {
+            if (instanceNumber > 0)
+            {
+                return true;
+            }            
+            return false;
+        }
+
+        /// <summary>
+        /// If the Drawcall needs to be canceled. 
+        /// Alternative to End().         
+        /// Resets beginCalled (internal).
+        /// </summary>
+        public void CancelDrawEnd()
+        {
+            beginCalled = false;
+        }
+
+        /// <summary>
+        /// Returns the amount of Drawcalls that has been drawn.
+        /// Shoud be called after End().
+        /// </summary>
+        /// <returns></returns>
+        public int GetDrawCount()
+        {
+            return drawCount;
+        }
 
         /// <summary>
         /// Starts collecting the “drawcalls” in an array before sending them to the graphics card in a (Vetex)Instancing buffer.        
@@ -425,6 +470,7 @@ namespace MonoGame.SpritesheetInstancing
             }
             // For the End Method
             beginCalled = true;
+            drawCount = 0;
             // Return if there is no Texture
             if (!hasSpritesheet)
             {
@@ -458,6 +504,7 @@ namespace MonoGame.SpritesheetInstancing
             }
             // For the End Method
             beginCalled = true;
+            drawCount = 0;
             // Return if there is no Texture
             if (!hasSpritesheet)
             {
@@ -493,6 +540,7 @@ namespace MonoGame.SpritesheetInstancing
 
             // For the End Method
             beginCalled = true;
+            drawCount = 0;
             // Return if there is no Texture
             if (!hasSpritesheet)
             {
@@ -531,6 +579,7 @@ namespace MonoGame.SpritesheetInstancing
 
             // For the End Method
             beginCalled = true;
+            drawCount = 0;
             // Return if there is no Texture
             if (!hasSpritesheet)
             {
@@ -933,20 +982,23 @@ namespace MonoGame.SpritesheetInstancing
 
             // Sets the Instancingbuffer
             // Dispose the buffer from the last Frame if the (vetex)instancingbuffer has changed
-            if (dynamicinstancingBuffer.VertexCount < instanceNumber)
+            if (instancingBuffers[currentBuffer].VertexCount < instanceNumber)
             {
-                dynamicinstancingBuffer?.Dispose();
-                dynamicinstancingBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), instanceNumber, BufferUsage.WriteOnly);
+                for (int i = 0; i < BUFFER_COUNT; i++)
+                {
+                    instancingBuffers[i]?.Dispose();
+                    instancingBuffers[i] = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), (int)System.Numerics.BitOperations.RoundUpToPowerOf2((nuint)instanceNumber), BufferUsage.WriteOnly);
+                }
             }
 
             // Fills the (vertex)instancingbuffer
-            dynamicinstancingBuffer.SetData(instanceDataArray, 0, instanceNumber, SetDataOptions.Discard);
+            instancingBuffers[currentBuffer].SetData(instanceDataArray, 0, instanceNumber, SetDataOptions.Discard);
 
             // Binds the vertexBuffers
             graphicsDevice.SetVertexBuffers(new VertexBufferBinding[]
             {
                 new VertexBufferBinding(vertexBuffer, 0, 0), // Dreieck-Versetzungen
-                new VertexBufferBinding(dynamicinstancingBuffer, 0, 1) // Instanzdaten
+                new VertexBufferBinding(instancingBuffers[currentBuffer], 0, 1) // Instanzdaten
             });
 
             // Indexbuffer
@@ -966,18 +1018,26 @@ namespace MonoGame.SpritesheetInstancing
 
             // Draws the 2 triangles on the screen
             graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 2, instanceNumber);
+            drawCount++;
+
+            // Select next instancing buffer
+            currentBuffer = (currentBuffer + 1) % BUFFER_COUNT; 
         }
     }
 
     public class SpritesheetInstancingAdv
     {
+        private readonly int BUFFER_COUNT;
+        private int currentBuffer = 0;
+        private int drawCount = 0;
+
         // Viewport, Buffer, Shader        
         private GraphicsDevice graphicsDevice;
         private Point viewPort;
         private Effect spritesheetInstancingShader;
         private VertexBuffer vertexBuffer;
         private IndexBuffer indexBuffer;
-        private DynamicVertexBuffer dynamicinstancingBuffer;
+        private DynamicVertexBuffer[] instancingBuffers;
 
         // Array       
         private InstanceData[][] instanceDataJaggedArray;   // Jagged Array for the Performance (List was slower by like 30%)
@@ -1008,8 +1068,10 @@ namespace MonoGame.SpritesheetInstancing
         /// <param name="spritesheetInstancingShader"></param>
         /// <param name="spriteSheets"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SpritesheetInstancingAdv(GraphicsDevice graphicsDevice, Point viewPortSizeXY, Effect spritesheetInstancingShader, Texture2D[] spriteSheets = null)
+        public SpritesheetInstancingAdv(GraphicsDevice graphicsDevice, Point viewPortSizeXY, Effect spritesheetInstancingShader, int bufferCount = 1, Texture2D[] spriteSheets = null)
         {
+            BUFFER_COUNT = Math.Max(1, bufferCount);
+
             // Like Spritebatch
             if (graphicsDevice == null)
             {
@@ -1054,9 +1116,13 @@ namespace MonoGame.SpritesheetInstancing
             // Indexbuffer for the 2 Triangles
             indexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indices.Length, BufferUsage.WriteOnly);
             indexBuffer.SetData(indices);
-
+                        
             // Dynamicinstancing Buffer
-            dynamicinstancingBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), 1, BufferUsage.WriteOnly);
+            instancingBuffers = new DynamicVertexBuffer[BUFFER_COUNT];
+            for (int i = 0; i < BUFFER_COUNT; i++)
+            {
+                instancingBuffers[i] = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), 1, BufferUsage.WriteOnly);
+            }
         }
 
         /// <summary>
@@ -1378,11 +1444,14 @@ namespace MonoGame.SpritesheetInstancing
         {
             vertexBuffer?.Dispose();
             indexBuffer?.Dispose();
-            dynamicinstancingBuffer?.Dispose();
+            for (int i = 0; i < BUFFER_COUNT; i++)
+            {
+                instancingBuffers[i]?.Dispose();
+            }
 
             vertexBuffer = null;
             indexBuffer = null;
-            dynamicinstancingBuffer = null;
+            instancingBuffers = null;
             instanceDataJaggedArray = null;
             spriteSheets = null;
         }
@@ -1472,7 +1541,42 @@ namespace MonoGame.SpritesheetInstancing
             }
         }
 
+        /// <summary>
+        /// Returns true/false if there is a single Drawcall or more.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasDrawCalls()
+        {
+            int length = instanceNumbers.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (instanceNumbers[i] > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
+        /// <summary>
+        /// If the Drawcall needs to be canceled. 
+        /// Alternative to End().         
+        /// Resets beginCalled (internal).
+        /// </summary>
+        public void CancelDrawEnd()
+        {
+            beginCalled = false;
+        }
+
+        /// <summary>
+        /// Returns the amount of Drawcalls that has been drawn.
+        /// Shoud be called after End().
+        /// </summary>
+        /// <returns></returns>
+        public int GetDrawCount()
+        {
+            return drawCount;
+        }
 
         /// <summary>
         /// Starts collecting draw calls in jagged arrays, which will be sent to the graphics card via a (Vertex) Instancing buffer, one after another.            
@@ -1489,6 +1593,7 @@ namespace MonoGame.SpritesheetInstancing
             }
             // For the End Method
             beginCalled = true;
+            drawCount = 0;
             // Return if there are no Textures
             if (!hasSpritesheets)
             {
@@ -1545,6 +1650,7 @@ namespace MonoGame.SpritesheetInstancing
             }
             // For the End Method
             beginCalled = true;
+            drawCount = 0;
             // Return if there are no Textures
             if (!hasSpritesheets)
             {
@@ -2665,20 +2771,23 @@ namespace MonoGame.SpritesheetInstancing
 
                 // Sets the Instancingbuffer
                 // Dispose the buffer from the last Frame if the (vetex)instancingbuffer has changed
-                if (dynamicinstancingBuffer.VertexCount < instanceNumbers[i])
+                if (instancingBuffers[currentBuffer].VertexCount < instanceNumbers[i])
                 {
-                    dynamicinstancingBuffer?.Dispose();
-                    dynamicinstancingBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), instanceNumbers[i], BufferUsage.WriteOnly);
+                    for (int j = 0; j < BUFFER_COUNT; j++)
+                    {
+                        instancingBuffers[j]?.Dispose();
+                        instancingBuffers[j] = new DynamicVertexBuffer(graphicsDevice, typeof(InstanceData), (int)System.Numerics.BitOperations.RoundUpToPowerOf2((nuint)instanceNumbers[i]), BufferUsage.WriteOnly);
+                    }
                 }
 
                 // Fills the (vertex)instancingbuffer
-                dynamicinstancingBuffer.SetData(instanceDataJaggedArray[i], 0, instanceNumbers[i], SetDataOptions.Discard);
+                instancingBuffers[currentBuffer].SetData(instanceDataJaggedArray[i], 0, instanceNumbers[i], SetDataOptions.Discard);
 
                 // Binds the vertexBuffers
                 graphicsDevice.SetVertexBuffers(new VertexBufferBinding[]
                 {
                     new VertexBufferBinding(vertexBuffer, 0, 0), // Dreieck-Versetzungen
-                    new VertexBufferBinding(dynamicinstancingBuffer, 0, 1) // Instanzdaten
+                    new VertexBufferBinding(instancingBuffers[currentBuffer], 0, 1) // Instanzdaten
                 });
 
                 // Indexbuffer
@@ -2698,6 +2807,10 @@ namespace MonoGame.SpritesheetInstancing
 
                 // Draws the 2 triangles on the screen
                 graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 2, instanceNumbers[i]);
+                drawCount++;
+
+                // Select next instancing buffer
+                currentBuffer = (currentBuffer + 1) % BUFFER_COUNT;
             }
         }
     }
